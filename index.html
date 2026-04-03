@@ -630,7 +630,9 @@ const provider = new GoogleAuthProvider();
 
 getRedirectResult(auth).then(result => {
   if (result?.user) {
-    // 로그인 성공 - onAuthStateChanged가 처리
+    notify('리디렉트 로그인 성공: ' + result.user.displayName);
+  } else {
+    notify('리디렉트 결과 없음');
   }
 }).catch(e => notify('로그인 실패: ' + e.message));
 
