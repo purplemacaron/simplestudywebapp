@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SimpleStudy</title>
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBhFXOPpDmuvk4bCueR0R1TpCNvWM3He1Y",
+  authDomain: "simplestudywebapp.firebaseapp.com",
+  projectId: "simplestudywebapp",
+  storageBucket: "simplestudywebapp.firebasestorage.app",
+  messagingSenderId: "341614199675",
+  appId: "1:341614199675:web:0c09815e860b365f05f3de"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+<script>
+const FIREBASE_CONFIG = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT.firebaseapp.com",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
+};
+
+// 운영자 감지: 이 배열에 운영자 브라우저 핑거프린트(또는 비밀 패스워드)를 설정하세요
+// 간단하게: URL에 ?admin=YOUR_SECRET 쿼리로 운영자 모드 활성화
+const ADMIN_SECRET = "simplestudy_admin_2024";
+</script>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, doc, addDoc, getDocs, deleteDoc,
+  updateDoc, onSnapshot, query, orderBy, serverTimestamp, getDoc, setDoc, increment
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ── Init ──────────────────────────────────────────────
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+window._db = db;
+window._fs = { collection, doc, addDoc, getDocs, deleteDoc, updateDoc,
+               onSnapshot, query, orderBy, serverTimestamp, getDoc, setDoc, increment };
+window._dbReady = true;
+window.dispatchEvent(new Event('db-ready'));
+</script>
+
+<!-- fabric.js for annotation -->
+<script src="https://unpkg.com/fabric@5.3.0/dist/fabric.min.js"></script>
+
+<!-- Google Fonts: Noto Sans KR -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --blue-50:  #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-200: #bfdbfe;
+  --blue-300: #93c5fd;
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+  --blue-800: #1e40af;
+  --gray-50:  #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+  --white: #ffffff;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --warn: #f59e0b;
+
+  --font: 'Noto Sans KR', sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 16px rgba(37,99,235,.08), 0 1px 4px rgba(0,0,0,.06);
+}
+
+/* ═══════════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--gray-50);
+  color: var(--gray-800);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════════ */
+nav {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  height: 56px;
+  gap: 4px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 1px 0 var(--gray-100);
+}
+.nav-logo {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--blue-600);
+  letter-spacing: -0.5px;
+  margin-right: 12px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.nav-logo span { color: var(--gray-800); }
+.nav-btn {
+  padding: 7px 13px;
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-500);
+  transition: all .15s;
+  font-family: var(--font);
+  white-space: nowrap;
+}
+.nav-btn:hover { background: var(--blue-50); color: var(--blue-600); }
+.nav-btn.active { background: var(--blue-600); color: var(--white); }
+.nav-spacer { flex: 1; }
+.admin-badge {
+  font-size: 11px;
+  background: var(--blue-600);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* ═══════════════════════════════════════════════
+   PAGE LAYOUT
+═══════════════════════════════════════════════ */
+.page { display: none; padding: 24px 20px; max-width: 960px; margin: 0 auto; }
+.page.active { display: block; }
+
+/* ═══════════════════════════════════════════════
+   CARD
+═══════════════════════════════════════════════ */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  border: 1px solid var(--gray-200);
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gray-700);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title svg { color: var(--blue-500); flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════ */
+.btn {
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--gray-200);
+  background: var(--white);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-700);
+  transition: all .15s;
+  font-family: var(--font);
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { background: var(--gray-50); border-color: var(--gray-300); }
+.btn:active { transform: scale(.98); }
+.btn.primary {
+  background: var(--blue-600);
+  color: var(--white);
+  border-color: var(--blue-600);
+}
+.btn.primary:hover { background: var(--blue-700); border-color: var(--blue-700); }
+.btn.danger { background: var(--danger); color: var(--white); border-color: var(--danger); }
+.btn.danger:hover { background: #dc2626; border-color: #dc2626; }
+.btn.success-btn { background: var(--success); color: var(--white); border-color: var(--success); }
+.btn.warn-btn { background: var(--warn); color: var(--white); border-color: var(--warn); }
+.btn.sm { padding: 6px 12px; font-size: 12px; }
+.btn.xs { padding: 4px 9px; font-size: 11px; }
+.btn-group { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+/* ═══════════════════════════════════════════════
+   INPUTS
+═══════════════════════════════════════════════ */
+input[type=time],input[type=text],input[type=number],textarea,select {
+  padding: 9px 12px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  outline: none;
+  transition: border-color .15s;
+  background: var(--white);
+  color: var(--gray-800);
+  font-family: var(--font);
+}
+input:focus, textarea:focus, select:focus { border-color: var(--blue-400); }
+textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+/* ═══════════════════════════════════════════════
+   TIMER PAGE
+═══════════════════════════════════════════════ */
+.timer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width:640px) { .timer-grid { grid-template-columns: 1fr; } }
+
+.timer-display {
+  font-size: 58px;
+  font-weight: 300;
+  letter-spacing: -2px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  margin: 16px 0;
+  color: var(--gray-800);
+  line-height: 1;
+}
+.timer-sub { font-size: 12px; color: var(--gray-400); text-align: center; margin-bottom: 14px; }
+
+/* progress ring */
+.ring-wrap { display: flex; justify-content: center; margin: 4px 0; }
+
+/* mode tabs */
+.mode-tabs {
+  display: flex;
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+.mode-tab {
+  flex: 1;
+  padding: 7px 6px;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-500);
+  transition: .15s;
+  font-family: var(--font);
+}
+.mode-tab.active {
+  background: var(--white);
+  color: var(--blue-600);
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+
+/* pomo dots */
+.pomo-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 12px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gray-200); transition: .3s; }
+.dot.done { background: var(--blue-500); }
+.dot.active { background: var(--blue-300); }
+
+/* ═══════════════════════════════════════════════
+   ALARM
+═══════════════════════════════════════════════ */
+.alarm-form { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.alarm-list { display: flex; flex-direction: column; gap: 8px; }
+.alarm-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-100);
+}
+.alarm-time { font-size: 22px; font-weight: 600; color: var(--gray-800); }
+.alarm-label { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.toggle {
+  width: 44px; height: 24px;
+  background: var(--gray-300);
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: .2s;
+  border: none;
+  flex-shrink: 0;
+}
+.toggle.on { background: var(--blue-500); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  top: 3px; left: 3px;
+  transition: .2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.toggle.on::after { left: 23px; }
+
+/* ═══════════════════════════════════════════════
+   STATS
+═══════════════════════════════════════════════ */
+.stats-row { display: flex; gap: 12px; }
+.stat-card {
+  flex: 1;
+  background: var(--blue-50);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  text-align: center;
+  border: 1px solid var(--blue-100);
+}
+.stat-num { font-size: 26px; font-weight: 700; color: var(--blue-600); }
+.stat-label { font-size: 11px; color: var(--blue-400); margin-top: 2px; font-weight: 500; }
+
+/* ═══════════════════════════════════════════════
+   TODO
+═══════════════════════════════════════════════ */
+.todo-form { display: flex; gap: 8px; margin-bottom: 14px; }
+.todo-form input { flex: 1; }
+.todo-progress { font-size: 12px; color: var(--gray-400); margin-bottom: 12px; }
+.todo-progress-bar {
+  height: 4px;
+  background: var(--gray-100);
+  border-radius: 99px;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.todo-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue-400), var(--blue-600));
+  border-radius: 99px;
+  transition: width .4s ease;
+}
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-100);
+  margin-bottom: 6px;
+  transition: .15s;
+}
+.todo-item.done { opacity: .55; }
+.todo-item.done span { text-decoration: line-through; }
+.checkbox {
+  width: 20px; height: 20px;
+  border-radius: 6px;
+  border: 2px solid var(--gray-300);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: .15s;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: transparent;
+}
+.checkbox.checked {
+  background: var(--blue-500);
+  border-color: var(--blue-500);
+  color: var(--white);
+}
+.todo-del {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray-300);
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: .15s;
+}
+.todo-del:hover { color: var(--danger); background: #fee2e2; }
+
+/* ═══════════════════════════════════════════════
+   ANNOTATION
+═══════════════════════════════════════════════ */
+.upload-area {
+  border: 2px dashed var(--gray-200);
+  border-radius: var(--radius);
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: .15s;
+  margin-bottom: 16px;
+  display: block;
+  color: var(--gray-500);
+}
+.upload-area:hover { border-color: var(--blue-300); background: var(--blue-50); color: var(--blue-500); }
+.upload-area input { display: none; }
+.tool-bar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-200);
+}
+.tool-btn {
+  width: 34px; height: 34px;
+  border-radius: 6px;
+  border: 1.5px solid var(--gray-200);
+  background: var(--white);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: .15s;
+  font-family: var(--font);
+  color: var(--gray-600);
+}
+.tool-btn:hover { background: var(--blue-50); border-color: var(--blue-200); color: var(--blue-600); }
+.tool-btn.active { background: var(--blue-500); color: var(--white); border-color: var(--blue-500); }
+.color-picker-row { display: flex; gap: 5px; align-items: center; }
+.color-swatch {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: .1s;
+}
+.color-swatch.active { border-color: var(--blue-500); transform: scale(1.2); }
+#canvas-wrap {
+  position: relative;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--white);
+  min-height: 300px;
+}
+#canvas-wrap canvas { display: block; }
+.size-slider { width: 70px; accent-color: var(--blue-500); }
+
+/* ═══════════════════════════════════════════════
+   VOCABULARY
+═══════════════════════════════════════════════ */
+.vocab-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin-bottom: 14px; }
+@media(max-width:500px) { .vocab-form { grid-template-columns: 1fr; } }
+
+.vocab-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.vocab-count { font-size: 12px; color: var(--gray-400); margin-left: auto; }
+
+.vocab-list { display: flex; flex-direction: column; gap: 6px; }
+.vocab-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-100);
+  gap: 8px;
+}
+.vocab-word { font-size: 15px; font-weight: 600; color: var(--gray-800); }
+.vocab-mean { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
+.vocab-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+/* Quiz */
+.quiz-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.6);
+  backdrop-filter: blur(4px);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  display: none;
+}
+.quiz-modal {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 24px 64px rgba(0,0,0,.18);
+  text-align: center;
+}
+.quiz-counter {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+.quiz-word {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 24px;
+  letter-spacing: -1px;
+}
+.quiz-input-wrap {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.quiz-input-wrap input { flex: 1; font-size: 15px; padding: 11px 14px; }
+.quiz-result {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: none;
+}
+.quiz-result.correct { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+.quiz-result.wrong { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+.quiz-score-bar {
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+.quiz-score-item { text-align: center; }
+.quiz-score-num { font-size: 24px; font-weight: 700; }
+.quiz-score-num.c { color: var(--success); }
+.quiz-score-num.w { color: var(--danger); }
+.quiz-score-label { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+/* ═══════════════════════════════════════════════
+   COMMUNITY
+═══════════════════════════════════════════════ */
+.community-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.community-header h2 { font-size: 18px; font-weight: 700; color: var(--gray-800); }
+
+.post-form-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  border: 1px solid var(--gray-200);
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.post-form-card textarea {
+  width: 100%;
+  min-height: 72px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+.post-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.post-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  border: 1px solid var(--gray-200);
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  transition: box-shadow .15s;
+}
+.post-card:hover { box-shadow: var(--shadow-md); }
+.post-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.post-author {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue-600);
+  background: var(--blue-50);
+  padding: 2px 8px;
+  border-radius: 99px;
+  border: 1px solid var(--blue-100);
+}
+.post-author.admin-author {
+  background: var(--blue-600);
+  color: white;
+  border-color: var(--blue-600);
+}
+.post-time { font-size: 11px; color: var(--gray-400); }
+.post-del-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray-300);
+  font-size: 16px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: .15s;
+  font-family: var(--font);
+}
+.post-del-btn:hover { color: var(--danger); background: #fee2e2; }
+.post-content {
+  font-size: 14px;
+  color: var(--gray-700);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin-bottom: 14px;
+}
+
+.comments-section { border-top: 1px solid var(--gray-100); padding-top: 12px; }
+.comment-item {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--gray-50);
+  margin-bottom: 6px;
+  border: 1px solid var(--gray-100);
+}
+.comment-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.comment-author { font-size: 11px; font-weight: 700; color: var(--blue-600); }
+.comment-author.admin-author { color: var(--blue-700); }
+.comment-time { font-size: 11px; color: var(--gray-400); }
+.comment-del {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray-300);
+  font-size: 13px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  transition: .15s;
+  font-family: var(--font);
+}
+.comment-del:hover { color: var(--danger); background: #fee2e2; }
+.comment-content { font-size: 13px; color: var(--gray-600); line-height: 1.5; word-break: break-all; }
+.comment-form {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.comment-form input { flex: 1; font-size: 13px; }
+
+/* empty state */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--gray-400);
+}
+.empty-state svg { margin-bottom: 12px; color: var(--gray-300); }
+.empty-state p { font-size: 14px; }
+
+/* ═══════════════════════════════════════════════
+   NOTIFICATION
+═══════════════════════════════════════════════ */
+.notif {
+  position: fixed;
+  top: 68px;
+  right: 20px;
+  background: var(--gray-900);
+  color: var(--white);
+  padding: 11px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  z-index: 999;
+  opacity: 0;
+  transform: translateY(-8px) translateX(8px);
+  transition: .25s cubic-bezier(.16,1,.3,1);
+  pointer-events: none;
+  max-width: 280px;
+  line-height: 1.4;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+}
+.notif.show { opacity: 1; transform: translateY(0) translateX(0); }
+
+/* ═══════════════════════════════════════════════
+   LOADING
+═══════════════════════════════════════════════ */
+.loading-spinner {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 2px solid var(--blue-100);
+  border-top-color: var(--blue-500);
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.db-status {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-weight: 500;
+}
+.db-status.ok { background: #dcfce7; color: #16a34a; }
+.db-status.err { background: #fee2e2; color: #dc2626; }
+.db-status.wait { background: var(--blue-50); color: var(--blue-500); }
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media(max-width:480px) {
+  .page { padding: 16px 14px; }
+  .card { padding: 16px; }
+  .timer-display { font-size: 44px; }
+  nav { padding: 0 12px; gap: 2px; }
+  .nav-btn { padding: 6px 9px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<!-- QUIZ OVERLAY -->
+<div class="quiz-overlay" id="quiz-overlay">
+  <div class="quiz-modal">
+    <div class="quiz-counter" id="quiz-counter">1 / 10</div>
+    <div class="quiz-word" id="quiz-word"></div>
+    <div class="quiz-score-bar">
+      <div class="quiz-score-item">
+        <div class="quiz-score-num c" id="quiz-correct">0</div>
+        <div class="quiz-score-label">정답</div>
+      </div>
+      <div class="quiz-score-item">
+        <div class="quiz-score-num w" id="quiz-wrong">0</div>
+        <div class="quiz-score-label">오답</div>
+      </div>
+    </div>
+    <div class="quiz-input-wrap">
+      <input type="text" id="quiz-input" placeholder="뜻을 입력하세요" onkeydown="if(event.key==='Enter')checkAnswer()">
+      <button class="btn primary" onclick="checkAnswer()">확인</button>
+    </div>
+    <div class="quiz-result" id="quiz-result"></div>
+    <div class="btn-group">
+      <button class="btn" id="quiz-next-btn" onclick="nextQuiz()" style="display:none">다음</button>
+      <button class="btn sm" onclick="stopQuiz()">퀴즈 종료</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================
+     NAV
+===================================================== -->
+<nav>
+  <a class="nav-logo" href="#">Simple<span>Study</span></a>
+  <button class="nav-btn active" onclick="goto('timer',this)">타이머</button>
+  <button class="nav-btn" onclick="goto('annotation',this)">필기</button>
+  <button class="nav-btn" onclick="goto('todo',this)">할일</button>
+  <button class="nav-btn" onclick="goto('vocab',this)">단어장</button>
+  <button class="nav-btn" onclick="goto('community',this)">커뮤니티</button>
+  <div class="nav-spacer"></div>
+  <span class="db-status wait" id="db-status">연결 중...</span>
+  <span class="admin-badge" id="admin-badge" style="display:none">운영자</span>
+</nav>
+
+<!-- ====================================================
+     TIMER PAGE
+===================================================== -->
+<div class="page active" id="page-timer">
+  <div class="timer-grid">
+
+    <!-- POMODORO -->
+    <div class="card">
+      <div class="card-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        포모도로
+      </div>
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="setPomoMode('focus',this)">집중 25분</button>
+        <button class="mode-tab" onclick="setPomoMode('short',this)">짧은 휴식</button>
+        <button class="mode-tab" onclick="setPomoMode('long',this)">긴 휴식</button>
+      </div>
+      <div class="pomo-dots" id="pomo-dots"></div>
+      <div class="ring-wrap">
+        <svg width="150" height="150" viewBox="0 0 160 160">
+          <circle cx="80" cy="80" r="68" fill="none" stroke="#e2e8f0" stroke-width="8"/>
+          <circle id="pomo-ring" cx="80" cy="80" r="68" fill="none" stroke="#3b82f6" stroke-width="8"
+            stroke-dasharray="427" stroke-dashoffset="0" stroke-linecap="round"
+            transform="rotate(-90 80 80)" style="transition:stroke-dashoffset .5s"/>
+        </svg>
+      </div>
+      <div class="timer-display" id="pomo-display">25:00</div>
+      <div class="timer-sub" id="pomo-status">집중 시간</div>
+      <div class="btn-group">
+        <button class="btn" onclick="pomoReset()">초기화</button>
+        <button class="btn primary" id="pomo-btn" onclick="pomoToggle()">시작</button>
+        <button class="btn" onclick="pomoSkip()">건너뛰기</button>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+
+      <!-- COUNTDOWN TIMER -->
+      <div class="card">
+        <div class="card-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          타이머
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
+          <input type="number" id="timer-h" placeholder="시" min="0" max="99" value="0" style="width:56px;text-align:center">
+          <span style="font-size:18px;color:var(--gray-300)">:</span>
+          <input type="number" id="timer-m" placeholder="분" min="0" max="59" value="25" style="width:56px;text-align:center">
+          <span style="font-size:18px;color:var(--gray-300)">:</span>
+          <input type="number" id="timer-s" placeholder="초" min="0" max="59" value="0" style="width:56px;text-align:center">
+        </div>
+        <div class="timer-display" id="timer-display" style="font-size:44px">25:00</div>
+        <div class="btn-group">
+          <button class="btn" onclick="timerReset()">초기화</button>
+          <button class="btn primary" id="timer-btn" onclick="timerToggle()">시작</button>
+        </div>
+      </div>
+
+      <!-- STOPWATCH -->
+      <div class="card">
+        <div class="card-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12"/></svg>
+          스톱워치 (순공)
+        </div>
+        <div class="timer-display" id="sw-display" style="font-size:40px">00:00:00</div>
+        <div id="sw-laps" style="max-height:80px;overflow-y:auto;margin-bottom:12px;font-size:12px;color:var(--gray-400)"></div>
+        <div class="btn-group">
+          <button class="btn" onclick="swLap()">랩</button>
+          <button class="btn primary" id="sw-btn" onclick="swToggle()">시작</button>
+          <button class="btn" onclick="swReset()">초기화</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALARM -->
+  <div class="card">
+    <div class="card-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      알람
+    </div>
+    <div class="alarm-form">
+      <input type="time" id="alarm-time" value="07:00">
+      <input type="text" id="alarm-label" placeholder="알람 이름" style="flex:1">
+      <button class="btn primary" onclick="addAlarm()">추가</button>
+    </div>
+    <div class="alarm-list" id="alarm-list"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="card">
+    <div class="card-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      오늘의 기록
+    </div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-pomo">0</div>
+        <div class="stat-label">완료 포모도로</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-sw">00:00</div>
+        <div class="stat-label">순공 시간</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-todo">0</div>
+        <div class="stat-label">완료 할일</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================
+     ANNOTATION PAGE
+===================================================== -->
+<div class="page" id="page-annotation">
+  <div class="card">
+    <div class="card-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      책 필기
+    </div>
+    <label class="upload-area" id="upload-area">
+      <input type="file" id="img-upload" accept="image/*" onchange="loadImage(event)">
+      <div style="font-size:28px;margin-bottom:8px;opacity:.5">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:inline-block"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px">사진 업로드</div>
+      <div style="font-size:12px;opacity:.6">클릭하거나 드래그해서 올리세요</div>
+    </label>
+
+    <div class="tool-bar" id="tool-bar" style="display:none">
+      <button class="tool-btn active" id="tool-pen" onclick="setTool('pen')" title="펜">✏</button>
+      <button class="tool-btn" id="tool-highlight" onclick="setTool('highlight')" title="형광펜">H</button>
+      <button class="tool-btn" id="tool-text" onclick="setTool('text')" title="텍스트">T</button>
+      <button class="tool-btn" id="tool-select" onclick="setTool('select')" title="선택">↖</button>
+      <button class="tool-btn" id="tool-erase" onclick="setTool('erase')" title="지우개">E</button>
+      <div style="width:1px;height:22px;background:var(--gray-200);margin:0 4px"></div>
+      <div class="color-picker-row" id="colors">
+        <div class="color-swatch active" style="background:#1e293b" onclick="setColor('#1e293b',this)"></div>
+        <div class="color-swatch" style="background:#ef4444" onclick="setColor('#ef4444',this)"></div>
+        <div class="color-swatch" style="background:#22c55e" onclick="setColor('#22c55e',this)"></div>
+        <div class="color-swatch" style="background:#3b82f6" onclick="setColor('#3b82f6',this)"></div>
+        <div class="color-swatch" style="background:#f59e0b" onclick="setColor('#f59e0b',this)"></div>
+        <div class="color-swatch" style="background:#a855f7" onclick="setColor('#a855f7',this)"></div>
+        <input type="color" id="custom-color" style="width:22px;height:22px;border:none;cursor:pointer;border-radius:50%;padding:0" onchange="setColor(this.value,null)">
+      </div>
+      <div style="width:1px;height:22px;background:var(--gray-200);margin:0 4px"></div>
+      <label style="font-size:12px;color:var(--gray-400)">굵기</label>
+      <input type="range" class="size-slider" id="size-slider" min="1" max="30" value="3" oninput="setBrushSize(this.value)">
+      <span id="size-label" style="font-size:12px;color:var(--gray-400);min-width:18px">3</span>
+      <div style="margin-left:auto;display:flex;gap:6px">
+        <button class="btn sm" onclick="undoCanvas()">실행취소</button>
+        <button class="btn sm" onclick="clearAnnotations()">초기화</button>
+        <button class="btn sm primary" onclick="saveCanvas()">저장</button>
+      </div>
+    </div>
+
+    <div id="canvas-wrap">
+      <canvas id="main-canvas"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================
+     TODO PAGE
+===================================================== -->
+<div class="page" id="page-todo">
+  <div class="card">
+    <div class="card-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      할 일
+    </div>
+    <div class="todo-form">
+      <input type="text" id="todo-input" placeholder="할 일 입력 후 Enter" onkeydown="if(event.key==='Enter')addTodo()">
+      <button class="btn primary" onclick="addTodo()">추가</button>
+    </div>
+    <div class="todo-progress" id="todo-progress">0 / 0 완료</div>
+    <div class="todo-progress-bar"><div class="todo-progress-fill" id="todo-fill" style="width:0%"></div></div>
+    <div id="todo-list"></div>
+  </div>
+</div>
+
+<!-- ====================================================
+     VOCAB PAGE
+===================================================== -->
+<div class="page" id="page-vocab">
+  <div class="card">
+    <div class="card-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      단어장
+    </div>
+    <div class="vocab-form">
+      <input type="text" id="vocab-word" placeholder="단어" onkeydown="if(event.key==='Enter')document.getElementById('vocab-mean').focus()">
+      <input type="text" id="vocab-mean" placeholder="뜻" onkeydown="if(event.key==='Enter')addVocab()">
+      <button class="btn primary" onclick="addVocab()">추가</button>
+    </div>
+    <div class="vocab-toolbar">
+      <button class="btn sm primary" onclick="startQuiz()">퀴즈 시작</button>
+      <button class="btn sm" onclick="shuffleVocab()">섞기</button>
+      <span class="vocab-count" id="vocab-count">0개</span>
+    </div>
+    <div class="vocab-list" id="vocab-list"></div>
+  </div>
+</div>
+
+<!-- ====================================================
+     COMMUNITY PAGE
+===================================================== -->
+<div class="page" id="page-community">
+  <div class="community-header">
+    <h2>커뮤니티</h2>
+    <span class="db-status wait" id="community-db-status">로딩 중...</span>
+  </div>
+
+  <!-- 글쓰기 -->
+  <div class="post-form-card">
+    <textarea id="post-content" placeholder="공부 기록, 질문, 공유하고 싶은 것을 남겨보세요..."></textarea>
+    <div class="post-form-footer">
+      <span style="font-size:12px;color:var(--gray-400)" id="post-author-label"></span>
+      <button class="btn primary" onclick="submitPost()">게시</button>
+    </div>
+  </div>
+
+  <div id="posts-container">
+    <div class="empty-state">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <p>아직 게시물이 없습니다</p>
+    </div>
+  </div>
+</div>
+
+<audio id="alarm-audio" preload="auto"></audio>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   ADMIN DETECTION
+══════════════════════════════════════════════════════ */
+const urlParams = new URLSearchParams(location.search);
+const IS_ADMIN = urlParams.get('admin') === ADMIN_SECRET;
+const AUTHOR_NAME = IS_ADMIN ? '운영자' : '익명';
+
+if (IS_ADMIN) {
+  document.getElementById('admin-badge').style.display = 'inline-block';
+}
+document.getElementById('post-author-label').textContent = IS_ADMIN ? '운영자로 게시됩니다' : '익명으로 게시됩니다';
+
+/* ══════════════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════════════ */
+function notify(msg) {
+  const n = document.getElementById('notif');
+  n.textContent = msg;
+  n.classList.add('show');
+  clearTimeout(n._t);
+  n._t = setTimeout(() => n.classList.remove('show'), 2600);
+}
+function pad(n) { return String(n).padStart(2, '0'); }
+function goto(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (page === 'community') initCommunity();
+}
+function timeAgo(ts) {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  const diff = (Date.now() - d) / 1000;
+  if (diff < 60) return '방금';
+  if (diff < 3600) return Math.floor(diff/60) + '분 전';
+  if (diff < 86400) return Math.floor(diff/3600) + '시간 전';
+  return d.toLocaleDateString('ko-KR', { month:'short', day:'numeric' });
+}
+
+/* ══════════════════════════════════════════════════════
+   DB READY
+══════════════════════════════════════════════════════ */
+function setDbStatus(ok) {
+  const el1 = document.getElementById('db-status');
+  const el2 = document.getElementById('community-db-status');
+  if (ok) {
+    [el1, el2].forEach(e => { e.className = 'db-status ok'; e.textContent = '연결됨'; });
+  } else {
+    [el1, el2].forEach(e => { e.className = 'db-status err'; e.textContent = '연결 오류'; });
+  }
+}
+
+// LocalStorage fallback when Firebase is not configured
+const USE_LOCAL = FIREBASE_CONFIG.apiKey === "YOUR_API_KEY";
+if (USE_LOCAL) {
+  document.getElementById('db-status').className = 'db-status warn';
+  document.getElementById('db-status').textContent = 'Firebase 미설정 (로컬)';
+  document.getElementById('db-status').style.cssText += 'background:#fef9c3;color:#854d0e;';
+}
+
+function lsLoad(k, def) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch { return def; } }
+function lsSave(k, v)  { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+
+/* ══════════════════════════════════════════════════════
+   POMODORO
+══════════════════════════════════════════════════════ */
+const POMO_MODES = { focus: 25*60, short: 5*60, long: 15*60 };
+const POMO_LABELS = { focus: '집중 시간', short: '짧은 휴식', long: '긴 휴식' };
+let pomoMode = 'focus', pomoLeft = 25*60, pomoRunning = false, pomoInterval = null;
+let pomoSession = 0, pomoDone = lsLoad('pomoDone', 0);
+
+function updatePomoDisplay() {
+  const m = Math.floor(pomoLeft / 60), s = pomoLeft % 60;
+  document.getElementById('pomo-display').textContent = pad(m) + ':' + pad(s);
+  const total = POMO_MODES[pomoMode];
+  const pct = 1 - pomoLeft / total;
+  document.getElementById('pomo-ring').style.strokeDashoffset = 427 * (1 - pct);
+  document.getElementById('pomo-ring').style.stroke = pomoMode === 'focus' ? '#3b82f6' : '#22c55e';
+}
+function renderPomoDots() {
+  const d = document.getElementById('pomo-dots');
+  d.innerHTML = '';
+  for (let i = 0; i < 4; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i < pomoDone % 4 ? ' done' : '') + (i === pomoSession && pomoMode === 'focus' ? ' active' : '');
+    d.appendChild(dot);
+  }
+}
+function setPomoMode(mode, el) {
+  if (pomoRunning) return;
+  pomoMode = mode;
+  pomoLeft = POMO_MODES[mode];
+  document.getElementById('pomo-status').textContent = POMO_LABELS[mode];
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  updatePomoDisplay();
+}
+function pomoToggle() {
+  pomoRunning = !pomoRunning;
+  document.getElementById('pomo-btn').textContent = pomoRunning ? '일시정지' : '시작';
+  if (pomoRunning) {
+    pomoInterval = setInterval(() => {
+      if (pomoLeft <= 0) {
+        clearInterval(pomoInterval); pomoRunning = false;
+        playBeep();
+        if (pomoMode === 'focus') {
+          pomoDone++; lsSave('pomoDone', pomoDone);
+          document.getElementById('stat-pomo').textContent = pomoDone;
+        }
+        notify(POMO_LABELS[pomoMode] + ' 완료!');
+        renderPomoDots();
+        document.getElementById('pomo-btn').textContent = '시작';
+        return;
+      }
+      pomoLeft--; updatePomoDisplay();
+    }, 1000);
+  } else clearInterval(pomoInterval);
+}
+function pomoReset() {
+  clearInterval(pomoInterval); pomoRunning = false;
+  pomoLeft = POMO_MODES[pomoMode];
+  document.getElementById('pomo-btn').textContent = '시작';
+  updatePomoDisplay();
+}
+function pomoSkip() { pomoLeft = 0; updatePomoDisplay(); }
+updatePomoDisplay(); renderPomoDots();
+document.getElementById('stat-pomo').textContent = pomoDone;
+
+/* ══════════════════════════════════════════════════════
+   COUNTDOWN TIMER
+══════════════════════════════════════════════════════ */
+let timerLeft = 0, timerRunning = false, timerInterval = null;
+function timerToggle() {
+  if (!timerRunning) {
+    const h = parseInt(document.getElementById('timer-h').value)||0;
+    const m = parseInt(document.getElementById('timer-m').value)||0;
+    const s = parseInt(document.getElementById('timer-s').value)||0;
+    if (!timerLeft) { timerLeft = h*3600+m*60+s; }
+    if (!timerLeft) return;
+  }
+  timerRunning = !timerRunning;
+  document.getElementById('timer-btn').textContent = timerRunning ? '일시정지' : '시작';
+  if (timerRunning) {
+    timerInterval = setInterval(() => {
+      if (timerLeft <= 0) {
+        clearInterval(timerInterval); timerRunning = false;
+        playBeep(); notify('타이머 종료!');
+        document.getElementById('timer-btn').textContent = '시작'; return;
+      }
+      timerLeft--;
+      const h=Math.floor(timerLeft/3600), m=Math.floor((timerLeft%3600)/60), s=timerLeft%60;
+      document.getElementById('timer-display').textContent = (h?pad(h)+':':'') + pad(m)+':'+pad(s);
+    }, 1000);
+  } else clearInterval(timerInterval);
+}
+function timerReset() {
+  clearInterval(timerInterval); timerRunning = false; timerLeft = 0;
+  document.getElementById('timer-btn').textContent = '시작';
+  document.getElementById('timer-display').textContent = '25:00';
+}
+
+/* ══════════════════════════════════════════════════════
+   STOPWATCH
+══════════════════════════════════════════════════════ */
+let swStart=0, swElapsed=0, swRunning=false, swInterval=null, swLaps=[];
+function swToggle() {
+  swRunning = !swRunning;
+  document.getElementById('sw-btn').textContent = swRunning ? '일시정지' : '시작';
+  if (swRunning) { swStart = Date.now() - swElapsed; swInterval = setInterval(swTick, 100); }
+  else clearInterval(swInterval);
+}
+function swTick() {
+  swElapsed = Date.now() - swStart;
+  const h=Math.floor(swElapsed/3600000), m=Math.floor((swElapsed%3600000)/60000), s=Math.floor((swElapsed%60000)/1000);
+  document.getElementById('sw-display').textContent = pad(h)+':'+pad(m)+':'+pad(s);
+  const sm = Math.floor(swElapsed/60000);
+  document.getElementById('stat-sw').textContent = pad(Math.floor(sm/60))+':'+pad(sm%60);
+}
+function swLap() {
+  if (!swRunning) return;
+  const h=Math.floor(swElapsed/3600000), m=Math.floor((swElapsed%3600000)/60000), s=Math.floor((swElapsed%60000)/1000);
+  const label = `랩 ${swLaps.length+1}: ${pad(h)}:${pad(m)}:${pad(s)}`;
+  swLaps.push(label);
+  const laps = document.getElementById('sw-laps');
+  laps.innerHTML = swLaps.slice(-5).map(l => `<div style="padding:1px 0">${l}</div>`).join('');
+  laps.scrollTop = laps.scrollHeight;
+}
+function swReset() {
+  clearInterval(swInterval); swRunning=false; swElapsed=0; swStart=0; swLaps=[];
+  document.getElementById('sw-display').textContent = '00:00:00';
+  document.getElementById('sw-btn').textContent = '시작';
+  document.getElementById('sw-laps').innerHTML = '';
+}
+
+/* ══════════════════════════════════════════════════════
+   ALARM
+══════════════════════════════════════════════════════ */
+let alarms = lsLoad('ss-alarms', []);
+setInterval(checkAlarms, 10000);
+function renderAlarms() {
+  document.getElementById('alarm-list').innerHTML = alarms.map((a,i) => `
+    <div class="alarm-item">
+      <div>
+        <div class="alarm-time">${a.time}</div>
+        <div class="alarm-label">${a.label||'알람'}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="toggle ${a.on?'on':''}" onclick="toggleAlarm(${i})"></button>
+        <button class="btn sm danger" onclick="deleteAlarm(${i})">삭제</button>
+      </div>
+    </div>`).join('') || '<div style="font-size:13px;color:var(--gray-400);padding:8px 0">알람 없음</div>';
+}
+function addAlarm() {
+  const t = document.getElementById('alarm-time').value;
+  const l = document.getElementById('alarm-label').value;
+  if (!t) return;
+  alarms.push({ time: t, label: l||'알람', on: true });
+  lsSave('ss-alarms', alarms); renderAlarms(); notify('알람 추가: ' + t);
+}
+function toggleAlarm(i) { alarms[i].on = !alarms[i].on; lsSave('ss-alarms', alarms); renderAlarms(); }
+function deleteAlarm(i) { alarms.splice(i,1); lsSave('ss-alarms', alarms); renderAlarms(); }
+function checkAlarms() {
+  const now = new Date();
+  const cur = pad(now.getHours())+':'+pad(now.getMinutes());
+  alarms.forEach(a => { if (a.on && a.time === cur) { playBeep(); notify('알람: ' + a.label); } });
+}
+renderAlarms();
+
+/* ══════════════════════════════════════════════════════
+   BEEP
+══════════════════════════════════════════════════════ */
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    [0,0.3,0.6].forEach(t => {
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value=880; o.type='sine';
+      g.gain.setValueAtTime(0.3, ctx.currentTime+t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+t+0.3);
+      o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+0.3);
+    });
+  } catch(e) {}
+}
+
+/* ══════════════════════════════════════════════════════
+   TODO
+══════════════════════════════════════════════════════ */
+let todos = lsLoad('ss-todos', []);
+function renderTodos() {
+  const done = todos.filter(t => t.done).length;
+  const total = todos.length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('todo-progress').textContent = `${done} / ${total} 완료 (${pct}%)`;
+  document.getElementById('todo-fill').style.width = pct + '%';
+  document.getElementById('stat-todo').textContent = done;
+  document.getElementById('todo-list').innerHTML = todos.map((t,i) => `
+    <div class="todo-item ${t.done?'done':''}">
+      <div class="checkbox ${t.done?'checked':''}" onclick="toggleTodo(${i})">${t.done?'✓':''}</div>
+      <span style="flex:1;font-size:13px">${escHtml(t.text)}</span>
+      <button class="todo-del" onclick="deleteTodo(${i})">×</button>
+    </div>`).join('');
+}
+function addTodo() {
+  const v = document.getElementById('todo-input').value.trim();
+  if (!v) return;
+  todos.unshift({ text: v, done: false });
+  lsSave('ss-todos', todos); renderTodos();
+  document.getElementById('todo-input').value = '';
+}
+function toggleTodo(i) { todos[i].done = !todos[i].done; lsSave('ss-todos', todos); renderTodos(); }
+function deleteTodo(i) { todos.splice(i,1); lsSave('ss-todos', todos); renderTodos(); }
+renderTodos();
+
+/* ══════════════════════════════════════════════════════
+   CANVAS / ANNOTATION
+══════════════════════════════════════════════════════ */
+let canvas=null, currentTool='pen', currentColor='#1e293b', brushSize=3;
+let history=[], imgLoaded=false;
+
+function initCanvas(w, h) {
+  if (canvas) canvas.dispose();
+  document.getElementById('canvas-wrap').innerHTML = '<canvas id="main-canvas"></canvas>';
+  canvas = new fabric.Canvas('main-canvas', { width:w, height:h, isDrawingMode:true });
+  canvas.freeDrawingBrush.color = currentColor;
+  canvas.freeDrawingBrush.width = brushSize;
+  canvas.on('object:added', () => { history.push(JSON.stringify(canvas)); });
+}
+function loadImage(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      const maxW = document.getElementById('canvas-wrap').offsetWidth || 800;
+      const scale = Math.min(1, maxW / img.width);
+      const w = Math.round(img.width*scale), h = Math.round(img.height*scale);
+      initCanvas(w, h);
+      fabric.Image.fromURL(ev.target.result, fimg => {
+        fimg.set({ left:0, top:0, scaleX:w/img.width, scaleY:h/img.height, selectable:false, evented:false });
+        canvas.add(fimg); canvas.sendToBack(fimg); canvas.renderAll();
+        imgLoaded = true;
+        document.getElementById('upload-area').style.display = 'none';
+        document.getElementById('tool-bar').style.display = 'flex';
+        history = [];
+      });
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function setTool(tool) {
+  currentTool = tool;
+  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tool-'+tool).classList.add('active');
+  if (!canvas) return;
+  if (tool==='pen') {
+    canvas.isDrawingMode=true;
+    canvas.freeDrawingBrush=new fabric.PencilBrush(canvas);
+    canvas.freeDrawingBrush.color=currentColor;
+    canvas.freeDrawingBrush.width=brushSize;
+  } else if (tool==='highlight') {
+    canvas.isDrawingMode=true;
+    canvas.freeDrawingBrush=new fabric.PencilBrush(canvas);
+    canvas.freeDrawingBrush.color=hexToRgba(currentColor,0.35);
+    canvas.freeDrawingBrush.width=20;
+  } else if (tool==='erase') {
+    canvas.isDrawingMode=true;
+    canvas.freeDrawingBrush=new fabric.PencilBrush(canvas);
+    canvas.freeDrawingBrush.color='#ffffff';
+    canvas.freeDrawingBrush.width=20;
+  } else if (tool==='text') {
+    canvas.isDrawingMode=false;
+    canvas.on('mouse:down', addTextOnClick);
+  } else if (tool==='select') {
+    canvas.isDrawingMode=false;
+    canvas.off('mouse:down', addTextOnClick);
+  }
+}
+function addTextOnClick(opt) {
+  if (currentTool !== 'text') return;
+  const p = canvas.getPointer(opt.e);
+  const t = new fabric.IText('텍스트', { left:p.x, top:p.y, fontSize:18, fill:currentColor, fontFamily:'Noto Sans KR,sans-serif' });
+  canvas.add(t); canvas.setActiveObject(t); t.enterEditing(); t.selectAll();
+  canvas.off('mouse:down', addTextOnClick);
+  currentTool = 'select';
+  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tool-select').classList.add('active');
+}
+function hexToRgba(hex, a) {
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function setColor(c, el) {
+  currentColor = c;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+  if (el) el.classList.add('active');
+  if (!canvas) return;
+  if (currentTool==='pen') canvas.freeDrawingBrush.color=c;
+  else if (currentTool==='highlight') canvas.freeDrawingBrush.color=hexToRgba(c,0.35);
+}
+function setBrushSize(v) {
+  brushSize = parseInt(v);
+  document.getElementById('size-label').textContent = v;
+  if (canvas && canvas.isDrawingMode) canvas.freeDrawingBrush.width = brushSize;
+}
+function undoCanvas() {
+  if (!canvas || history.length < 2) return;
+  history.pop();
+  canvas.loadFromJSON(history[history.length-1]||'{}', () => canvas.renderAll());
+}
+function clearAnnotations() {
+  if (!canvas) return;
+  const bg = canvas.getObjects().find(o => !o.selectable);
+  canvas.clear();
+  if (bg) canvas.add(bg);
+  canvas.renderAll(); history = [];
+}
+function saveCanvas() {
+  if (!canvas) return;
+  const a = document.createElement('a');
+  a.download = 'study-note.png';
+  a.href = canvas.toDataURL({ format:'png', quality:1 });
+  a.click(); notify('저장 완료!');
+}
+
+// drag & drop
+const ua = document.getElementById('upload-area');
+ua.addEventListener('dragover', e => { e.preventDefault(); ua.style.borderColor='var(--blue-300)'; });
+ua.addEventListener('dragleave', () => { ua.style.borderColor=''; });
+ua.addEventListener('drop', e => {
+  e.preventDefault(); ua.style.borderColor='';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const dt = new DataTransfer(); dt.items.add(file);
+    document.getElementById('img-upload').files = dt.files;
+    loadImage({ target: { files: dt.files } });
+  }
+});
+
+/* ══════════════════════════════════════════════════════
+   VOCABULARY
+══════════════════════════════════════════════════════ */
+let vocabList = lsLoad('ss-vocab', []);
+let quizMode=false, quizIdx=0, quizOrder=[], quizCorrect=0, quizWrong=0, quizAnswered=false;
+
+function renderVocab() {
+  document.getElementById('vocab-count').textContent = `총 ${vocabList.length}개`;
+  document.getElementById('vocab-list').innerHTML = vocabList.length ? vocabList.map((v,i) => `
+    <div class="vocab-item">
+      <div>
+        <div class="vocab-word">${escHtml(v.word)}</div>
+        <div class="vocab-mean">${escHtml(v.mean)}</div>
+      </div>
+      <div class="vocab-actions">
+        <button class="btn xs danger" onclick="deleteVocab(${i})">삭제</button>
+      </div>
+    </div>`).join('') : '<div style="font-size:13px;color:var(--gray-400);padding:12px 0;text-align:center">단어를 추가하세요</div>';
+}
+function addVocab() {
+  const w = document.getElementById('vocab-word').value.trim();
+  const m = document.getElementById('vocab-mean').value.trim();
+  if (!w || !m) { notify('단어와 뜻을 모두 입력하세요'); return; }
+  vocabList.unshift({ word: w, mean: m });
+  lsSave('ss-vocab', vocabList); renderVocab();
+  document.getElementById('vocab-word').value = '';
+  document.getElementById('vocab-mean').value = '';
+  document.getElementById('vocab-word').focus();
+}
+function deleteVocab(i) { vocabList.splice(i,1); lsSave('ss-vocab', vocabList); renderVocab(); }
+function shuffleVocab() {
+  for (let i=vocabList.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));
+    [vocabList[i],vocabList[j]]=[vocabList[j],vocabList[i]];
+  }
+  lsSave('ss-vocab', vocabList); renderVocab(); notify('섞었습니다');
+}
+function startQuiz() {
+  if (!vocabList.length) { notify('단어를 먼저 추가하세요'); return; }
+  quizMode=true; quizIdx=0; quizCorrect=0; quizWrong=0; quizAnswered=false;
+  quizOrder = [...Array(vocabList.length).keys()].sort(() => Math.random()-.5);
+  document.getElementById('quiz-overlay').style.display = 'flex';
+  document.getElementById('quiz-correct').textContent = '0';
+  document.getElementById('quiz-wrong').textContent = '0';
+  showQuizWord();
+}
+function showQuizWord() {
+  const v = vocabList[quizOrder[quizIdx]];
+  document.getElementById('quiz-counter').textContent = `${quizIdx+1} / ${quizOrder.length}`;
+  document.getElementById('quiz-word').textContent = v.word;
+  document.getElementById('quiz-input').value = '';
+  document.getElementById('quiz-result').style.display = 'none';
+  document.getElementById('quiz-next-btn').style.display = 'none';
+  quizAnswered = false;
+  setTimeout(() => document.getElementById('quiz-input').focus(), 100);
+}
+function checkAnswer() {
+  if (quizAnswered) { nextQuiz(); return; }
+  const input = document.getElementById('quiz-input').value.trim();
+  if (!input) return;
+  const correct = vocabList[quizOrder[quizIdx]].mean;
+  const isCorrect = input === correct ||
+    input.replace(/\s/g,'') === correct.replace(/\s/g,'') ||
+    correct.split(/[,\/,、]/).map(s=>s.trim()).some(s => s && input.includes(s));
+  const resultEl = document.getElementById('quiz-result');
+  if (isCorrect) {
+    quizCorrect++;
+    resultEl.className = 'quiz-result correct';
+    resultEl.textContent = '정답! — ' + correct;
+  } else {
+    quizWrong++;
+    resultEl.className = 'quiz-result wrong';
+    resultEl.textContent = '오답. 정답: ' + correct;
+  }
+  resultEl.style.display = 'block';
+  document.getElementById('quiz-correct').textContent = quizCorrect;
+  document.getElementById('quiz-wrong').textContent = quizWrong;
+  quizAnswered = true;
+  if (quizIdx < quizOrder.length - 1) {
+    document.getElementById('quiz-next-btn').style.display = 'inline-flex';
+  } else {
+    document.getElementById('quiz-next-btn').style.display = 'none';
+    setTimeout(() => {
+      const total = quizOrder.length;
+      const pct = Math.round(quizCorrect/total*100);
+      notify(`퀴즈 완료! ${quizCorrect}/${total} (${pct}%)`);
+    }, 800);
+  }
+}
+function nextQuiz() {
+  quizIdx++;
+  if (quizIdx >= quizOrder.length) { stopQuiz(); return; }
+  showQuizWord();
+}
+function stopQuiz() {
+  quizMode = false;
+  document.getElementById('quiz-overlay').style.display = 'none';
+}
+document.getElementById('quiz-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('quiz-overlay')) stopQuiz();
+});
+renderVocab();
+
+/* ══════════════════════════════════════════════════════
+   COMMUNITY (Firestore)
+══════════════════════════════════════════════════════ */
+let communityInited = false;
+let postsUnsubscribe = null;
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function initCommunity() {
+  if (communityInited) return;
+  communityInited = true;
+
+  if (USE_LOCAL) {
+    // LocalStorage fallback
+    document.getElementById('community-db-status').className = 'db-status';
+    document.getElementById('community-db-status').style.cssText = 'background:#fef9c3;color:#854d0e;font-size:11px;padding:3px 8px;border-radius:99px;font-weight:500;';
+    document.getElementById('community-db-status').textContent = 'Firebase 미설정';
+    renderLocalPosts();
+    return;
+  }
+
+  // Wait for DB
+  if (!window._dbReady) {
+    await new Promise(r => window.addEventListener('db-ready', r, { once: true }));
+  }
+
+  try {
+    setDbStatus(true);
+    const db = window._db;
+    const { collection, query, orderBy, onSnapshot } = window._fs;
+    const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+    postsUnsubscribe = onSnapshot(q, snap => {
+      const posts = [];
+      snap.forEach(d => posts.push({ id: d.id, ...d.data() }));
+      renderPosts(posts);
+    }, err => {
+      console.error(err); setDbStatus(false);
+      notify('커뮤니티 연결 오류');
+    });
+  } catch (e) {
+    console.error(e); setDbStatus(false);
+    notify('Firebase 연결 실패. 설정을 확인하세요.');
+  }
+}
+
+// ── LocalStorage fallback ────────────────────────────
+function renderLocalPosts() {
+  const posts = lsLoad('ss-posts', []).sort((a,b) => b.createdAt - a.createdAt);
+  renderPosts(posts.map(p => ({...p, createdAt: { toDate: () => new Date(p.createdAt) }})));
+}
+
+// ── Firestore submit ─────────────────────────────────
+async function submitPost() {
+  const content = document.getElementById('post-content').value.trim();
+  if (!content) return;
+
+  if (USE_LOCAL) {
+    const posts = lsLoad('ss-posts', []);
+    posts.unshift({ id: Date.now()+'', content, author: AUTHOR_NAME, isAdmin: IS_ADMIN, createdAt: Date.now(), comments: [] });
+    lsSave('ss-posts', posts);
+    document.getElementById('post-content').value = '';
+    renderLocalPosts(); notify('게시되었습니다');
+    return;
+  }
+
+  if (!window._dbReady) return;
+  const db = window._db;
+  const { collection, addDoc, serverTimestamp } = window._fs;
+  try {
+    await addDoc(collection(db, 'posts'), {
+      content, author: AUTHOR_NAME, isAdmin: IS_ADMIN,
+      createdAt: serverTimestamp()
+    });
+    document.getElementById('post-content').value = '';
+    notify('게시되었습니다');
+  } catch(e) { console.error(e); notify('게시 실패: ' + e.message); }
+}
+
+// ── Firestore delete post ────────────────────────────
+async function deletePost(postId) {
+  if (!IS_ADMIN) return;
+  if (!confirm('삭제하시겠습니까?')) return;
+
+  if (USE_LOCAL) {
+    let posts = lsLoad('ss-posts', []);
+    posts = posts.filter(p => p.id !== postId);
+    lsSave('ss-posts', posts); renderLocalPosts(); return;
+  }
+
+  const db = window._db;
+  const { doc, deleteDoc } = window._fs;
+  try { await deleteDoc(doc(db, 'posts', postId)); } catch(e) { notify('삭제 실패'); }
+}
+
+// ── Firestore add comment ────────────────────────────
+async function submitComment(postId) {
+  const input = document.getElementById('comment-input-' + postId);
+  const text = input.value.trim();
+  if (!text) return;
+
+  if (USE_LOCAL) {
+    const posts = lsLoad('ss-posts', []);
+    const p = posts.find(x => x.id === postId);
+    if (p) {
+      if (!p.comments) p.comments = [];
+      p.comments.push({ id: Date.now()+'', text, author: AUTHOR_NAME, isAdmin: IS_ADMIN, createdAt: Date.now() });
+      lsSave('ss-posts', posts); renderLocalPosts();
+    }
+    input.value = ''; return;
+  }
+
+  const db = window._db;
+  const { doc, updateDoc, arrayUnion, serverTimestamp } = window._fs;
+  try {
+    await updateDoc(doc(db, 'posts', postId), {
+      comments: (window._fs.arrayUnion || arrayUnion)({
+        id: Date.now()+'',
+        text, author: AUTHOR_NAME, isAdmin: IS_ADMIN,
+        createdAt: new Date().toISOString()
+      })
+    });
+    input.value = '';
+  } catch(e) { console.error(e); notify('댓글 등록 실패'); }
+}
+
+// ── Firestore delete comment ─────────────────────────
+async function deleteComment(postId, commentId) {
+  if (!IS_ADMIN) return;
+
+  if (USE_LOCAL) {
+    const posts = lsLoad('ss-posts', []);
+    const p = posts.find(x => x.id === postId);
+    if (p) { p.comments = (p.comments||[]).filter(c => c.id !== commentId); lsSave('ss-posts', posts); renderLocalPosts(); }
+    return;
+  }
+
+  const db = window._db;
+  const { doc, getDoc, updateDoc } = window._fs;
+  try {
+    const snap = await getDoc(doc(db, 'posts', postId));
+    if (!snap.exists()) return;
+    const comments = (snap.data().comments||[]).filter(c => c.id !== commentId);
+    await updateDoc(doc(db, 'posts', postId), { comments });
+  } catch(e) { notify('댓글 삭제 실패'); }
+}
+
+// ── Render posts ─────────────────────────────────────
+function renderPosts(posts) {
+  const container = document.getElementById('posts-container');
+  if (!posts.length) {
+    container.innerHTML = `<div class="empty-state">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <p>아직 게시물이 없습니다</p></div>`;
+    return;
+  }
+
+  container.innerHTML = posts.map(p => {
+    const comments = (p.comments||[]);
+    const commentsHtml = comments.map(c => `
+      <div class="comment-item">
+        <div class="comment-meta">
+          <span class="comment-author ${c.isAdmin?'admin-author':''}">${escHtml(c.author||'익명')}</span>
+          <span class="comment-time">${c.createdAt ? timeAgo(typeof c.createdAt === 'string' ? { toDate: ()=>new Date(c.createdAt) } : c.createdAt) : ''}</span>
+          ${IS_ADMIN ? `<button class="comment-del" onclick="deleteComment('${p.id}','${c.id}')">×</button>` : ''}
+        </div>
+        <div class="comment-content">${escHtml(c.text||'')}</div>
+      </div>`).join('');
+
+    return `<div class="post-card">
+      <div class="post-meta">
+        <span class="post-author ${p.isAdmin?'admin-author':''}">${escHtml(p.author||'익명')}</span>
+        <span class="post-time">${p.createdAt ? timeAgo(p.createdAt) : ''}</span>
+        ${IS_ADMIN ? `<button class="post-del-btn" onclick="deletePost('${p.id}')">×</button>` : ''}
+      </div>
+      <div class="post-content">${escHtml(p.content||'')}</div>
+      <div class="comments-section">
+        ${commentsHtml}
+        <div class="comment-form">
+          <input type="text" id="comment-input-${p.id}" placeholder="댓글 달기..." onkeydown="if(event.key==='Enter')submitComment('${p.id}')">
+          <button class="btn sm primary" onclick="submitComment('${p.id}')">등록</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
