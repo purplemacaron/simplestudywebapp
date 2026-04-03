@@ -284,20 +284,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
   <div class="auth-box">
     <div class="auth-logo">Simple<span>Study</span></div>
     <div class="auth-desc">공부 기록을 어디서든 이어가세요.</div>
-    <div style="display:flex;gap:0;margin-bottom:24px;border:1.5px solid var(--g200);border-radius:var(--rs);overflow:hidden">
-      <button id="tab-login" onclick="switchTab('login')" style="flex:1;padding:9px;border:none;background:var(--b600);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">로그인</button>
-      <button id="tab-signup" onclick="switchTab('signup')" style="flex:1;padding:9px;border:none;background:var(--white);color:var(--g500);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">회원가입</button>
-    </div>
-    <input type="email" id="auth-email" placeholder="이메일" style="width:100%;margin-bottom:10px;padding:12px 14px;font-size:14px;border:1.5px solid var(--g200);border-radius:var(--rs)">
-    <input type="password" id="auth-password" placeholder="비밀번호 (6자 이상)" style="width:100%;margin-bottom:16px;padding:12px 14px;font-size:14px;border:1.5px solid var(--g200);border-radius:var(--rs)" onkeydown="if(event.key==='Enter')doSignIn()">
-    <button class="google-btn" id="auth-submit-btn" onclick="doSignIn()">로그인</button>
-    <div style="display:flex;align-items:center;gap:10px;margin:16px 0">
-      <div style="flex:1;height:1px;background:var(--g200)"></div>
-      <span style="font-size:12px;color:var(--g400)">또는</span>
-      <div style="flex:1;height:1px;background:var(--g200)"></div>
-    </div>
-    <button onclick="doAnonymous()" style="width:100%;padding:12px;border:1.5px solid var(--g200);border-radius:var(--rs);background:var(--white);font-size:13px;font-weight:600;color:var(--g600);cursor:pointer;font-family:var(--font)">👤 익명으로 시작</button>
-    <p class="auth-note">로그인하면 모든 공부 데이터가 클라우드에 저장되며<br>어디서든 불러올 수 있습니다.</p>
+    <button class="google-btn" onclick="doAnonymous()">👤 익명으로 시작</button>
+    <p class="auth-note">데이터는 이 기기에만 저장됩니다.</p>
   </div>
 </div>
 
@@ -557,7 +545,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInAnonymously,
+  getAuth, signInAnonymously,
   signOut as fbSignOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
@@ -630,43 +618,9 @@ const fsColUpd = async (col, id, data) =>
 // ═══════════════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════════════
-let authMode = 'login';
-
-window.switchTab = (mode) => {
-  authMode = mode;
-  document.getElementById('tab-login').style.background = mode==='login' ? 'var(--b600)' : 'var(--white)';
-  document.getElementById('tab-login').style.color = mode==='login' ? '#fff' : 'var(--g500)';
-  document.getElementById('tab-signup').style.background = mode==='signup' ? 'var(--b600)' : 'var(--white)';
-  document.getElementById('tab-signup').style.color = mode==='signup' ? '#fff' : 'var(--g500)';
-  document.getElementById('auth-submit-btn').textContent = mode==='login' ? '로그인' : '회원가입';
-};
-
-window.doSignIn = async () => {
-  const email = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-password').value;
-  if (!email || !password) { notify('이메일과 비밀번호를 입력하세요'); return; }
-  try {
-    if (authMode === 'signup') {
-      await createUserWithEmailAndPassword(auth, email, password);
-    } else {
-      await signInWithEmailAndPassword(auth, email, password);
-    }
-  } catch(e) {
-    const msgs = {
-      'auth/user-not-found': '등록되지 않은 이메일이에요',
-      'auth/wrong-password': '비밀번호가 틀렸어요',
-      'auth/email-already-in-use': '이미 사용 중인 이메일이에요',
-      'auth/weak-password': '비밀번호는 6자 이상이어야 해요',
-      'auth/invalid-email': '이메일 형식이 올바르지 않아요',
-      'auth/invalid-credential': '이메일 또는 비밀번호가 틀렸어요',
-    };
-    notify(msgs[e.code] || '오류: ' + e.message);
-  }
-};
-
 window.doAnonymous = async () => {
   try { await signInAnonymously(auth); }
-  catch(e) { notify('익명 로그인 실패: ' + e.message); }
+  catch(e) { notify('오류: ' + e.message); }
 };
 
 window.doSignOut = async () => {
@@ -781,11 +735,26 @@ window.pomoToggle = () => {
   pomoRunning = !pomoRunning;
   updatePomoUI(); renderCycleDots();
   if (pomoRunning) {
-    pomoInterval = setInterval(()=>{ if(pomoLeft<=0){pomoPhaseComplete();return;} pomoLeft--; updatePomoUI(); }, 1000);
+    pomoInterval = setInterval(()=>{ if(pomoLeft<=0){pomoPhaseComplete();return;} pomoLeft--; updatePomoUI(); savePomoState(); }, 1000);
   } else {
-    clearInterval(pomoInterval);
+    clearInterval(pomoInterval); savePomoState();
   }
 };
+
+function savePomoState() {
+  localStorage.setItem('ss_pomo', JSON.stringify({pomoPhase, pomoLeft, pomoFocusDone, pomoCycleTotal}));
+}
+function loadPomoState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('ss_pomo'));
+    if (!s) return;
+    pomoPhase=s.pomoPhase; pomoLeft=s.pomoLeft; pomoFocusDone=s.pomoFocusDone; pomoCycleTotal=s.pomoCycleTotal;
+    updatePomoUI(); renderCycleDots();
+    // 자동 재시작
+    pomoRunning = true;
+    pomoInterval = setInterval(()=>{ if(pomoLeft<=0){pomoPhaseComplete();return;} pomoLeft--; updatePomoUI(); savePomoState(); }, 1000);
+  } catch(e) {}
+}
 
 function pomoPhaseComplete() {
   clearInterval(pomoInterval); pomoRunning = false;
@@ -814,7 +783,8 @@ function pomoPhaseComplete() {
 }
 
 window.pomoReset = () => {
-  clearInterval(pomoInterval); pomoRunning = false; pomoFocusDone = 0; pomoInit();
+  clearInterval(pomoInterval); pomoRunning = false; pomoFocusDone = 0;
+  localStorage.removeItem('ss_pomo'); pomoInit();
 };
 window.pomoSkip  = () => { pomoLeft = 0; };
 window.resetCycleStats = () => {
@@ -824,7 +794,15 @@ async function savePomodoroStat(total) {
   if (!currentUser) return;
   await fsSet('stats/pomodoro', {total, updatedAt: new Date().toISOString()});
 }
-pomoInit();
+
+// 포모도로 설정 바뀌면 즉시 반영
+['pomo-focus-min','pomo-short-min','pomo-long-min','pomo-cycle-count'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    if(!pomoRunning) pomoInit();
+  });
+});
+
+if (localStorage.getItem('ss_pomo')) { loadPomoState(); } else { pomoInit(); }
 
 // ═══════════════════════════════════════════════════════
 // COUNTDOWN TIMER
@@ -844,20 +822,63 @@ window.timerToggle = () => {
     timerInterval = setInterval(()=>{
       if (timerLeft<=0) {
         clearInterval(timerInterval); timerRunning=false;
+        localStorage.removeItem('ss_timer');
         playBeep(); notify('타이머 종료!');
         document.getElementById('timer-btn').textContent='시작'; return;
       }
       timerLeft--;
       const h=Math.floor(timerLeft/3600),m=Math.floor((timerLeft%3600)/60),s=timerLeft%60;
       document.getElementById('timer-display').textContent=(h?pad(h)+':':'')+pad(m)+':'+pad(s);
+      localStorage.setItem('ss_timer', timerLeft);
     },1000);
-  } else clearInterval(timerInterval);
+  } else { clearInterval(timerInterval); localStorage.setItem('ss_timer', timerLeft); }
 };
 window.timerReset = () => {
   clearInterval(timerInterval); timerRunning=false; timerLeft=0;
+  localStorage.removeItem('ss_timer');
   document.getElementById('timer-btn').textContent='시작';
-  document.getElementById('timer-display').textContent='25:00';
+  const h=parseInt(document.getElementById('timer-h').value)||0;
+  const m=parseInt(document.getElementById('timer-m').value)||0;
+  const s=parseInt(document.getElementById('timer-s').value)||0;
+  document.getElementById('timer-display').textContent=(h?pad(h)+':':'')+pad(m)+':'+pad(s);
 };
+
+// 타이머 복원
+(()=>{
+  const saved = localStorage.getItem('ss_timer');
+  if (saved) {
+    timerLeft = parseInt(saved);
+    const h=Math.floor(timerLeft/3600),m=Math.floor((timerLeft%3600)/60),s=timerLeft%60;
+    document.getElementById('timer-display').textContent=(h?pad(h)+':':'')+pad(m)+':'+pad(s);
+    timerRunning = true;
+    document.getElementById('timer-btn').textContent='일시정지';
+    timerInterval = setInterval(()=>{
+      if (timerLeft<=0) {
+        clearInterval(timerInterval); timerRunning=false;
+        localStorage.removeItem('ss_timer');
+        playBeep(); notify('타이머 종료!');
+        document.getElementById('timer-btn').textContent='시작'; return;
+      }
+      timerLeft--;
+      const h=Math.floor(timerLeft/3600),m=Math.floor((timerLeft%3600)/60),s=timerLeft%60;
+      document.getElementById('timer-display').textContent=(h?pad(h)+':':'')+pad(m)+':'+pad(s);
+      localStorage.setItem('ss_timer', timerLeft);
+    },1000);
+  }
+})();
+
+// 타이머 입력값 바뀌면 즉시 표시 업데이트
+['timer-h','timer-m','timer-s'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    if(!timerRunning){
+      timerLeft=0;
+      const h=parseInt(document.getElementById('timer-h').value)||0;
+      const m=parseInt(document.getElementById('timer-m').value)||0;
+      const s=parseInt(document.getElementById('timer-s').value)||0;
+      document.getElementById('timer-display').textContent=(h?pad(h)+':':'')+pad(m)+':'+pad(s);
+    }
+  });
+});
 
 // ═══════════════════════════════════════════════════════
 // STOPWATCH
@@ -866,15 +887,19 @@ let swStart=0, swElapsed=0, swRunning=false, swInterval=null, swLaps=[];
 window.swToggle = () => {
   swRunning = !swRunning;
   document.getElementById('sw-btn').textContent = swRunning?'일시정지':'시작';
-  if (swRunning) { swStart=Date.now()-swElapsed; swInterval=setInterval(swTick,100); }
-  else clearInterval(swInterval);
+  if (swRunning) {
+    swStart=Date.now()-swElapsed;
+    swInterval=setInterval(()=>{ swTick(); localStorage.setItem('ss_sw', swElapsed); },100);
+  } else {
+    clearInterval(swInterval); localStorage.setItem('ss_sw', swElapsed);
+  }
 };
 function swTick() {
   swElapsed = Date.now()-swStart;
   const h=Math.floor(swElapsed/3600000),m=Math.floor((swElapsed%3600000)/60000),s=Math.floor((swElapsed%60000)/1000);
   document.getElementById('sw-display').textContent=pad(h)+':'+pad(m)+':'+pad(s);
-  const sm=Math.floor(swElapsed/60000);
-  document.getElementById('stat-sw').textContent=pad(Math.floor(sm/60))+':'+pad(sm%60);
+  const totalMin=Math.floor(swElapsed/60000);
+  document.getElementById('stat-sw').textContent=pad(Math.floor(totalMin/60))+':'+pad(totalMin%60);
 }
 window.swLap = () => {
   if (!swRunning) return;
@@ -886,10 +911,25 @@ window.swLap = () => {
 };
 window.swReset = () => {
   clearInterval(swInterval); swRunning=false; swElapsed=0; swStart=0; swLaps=[];
+  localStorage.removeItem('ss_sw');
   document.getElementById('sw-display').textContent='00:00:00';
+  document.getElementById('stat-sw').textContent='00:00';
   document.getElementById('sw-btn').textContent='시작';
   document.getElementById('sw-laps').innerHTML='';
 };
+
+// 스톱워치 복원
+(()=>{
+  const saved = localStorage.getItem('ss_sw');
+  if (saved) {
+    swElapsed = parseInt(saved);
+    swTick();
+    swRunning = true;
+    document.getElementById('sw-btn').textContent='일시정지';
+    swStart = Date.now()-swElapsed;
+    swInterval = setInterval(()=>{ swTick(); localStorage.setItem('ss_sw', swElapsed); }, 100);
+  }
+})();
 
 // ═══════════════════════════════════════════════════════
 // ALARM
