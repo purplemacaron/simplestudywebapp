@@ -284,13 +284,19 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
   <div class="auth-box">
     <div class="auth-logo">Simple<span>Study</span></div>
     <div class="auth-desc">공부 기록을 어디서든 이어가세요.</div>
-    <div id="auth-tab" style="display:flex;gap:0;margin-bottom:24px;border:1.5px solid var(--g200);border-radius:var(--rs);overflow:hidden">
-      <button onclick="switchTab('login')" id="tab-login" style="flex:1;padding:9px;border:none;background:var(--b600);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">로그인</button>
-      <button onclick="switchTab('signup')" id="tab-signup" style="flex:1;padding:9px;border:none;background:var(--white);color:var(--g500);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">회원가입</button>
+    <div style="display:flex;gap:0;margin-bottom:24px;border:1.5px solid var(--g200);border-radius:var(--rs);overflow:hidden">
+      <button id="tab-login" onclick="switchTab('login')" style="flex:1;padding:9px;border:none;background:var(--b600);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">로그인</button>
+      <button id="tab-signup" onclick="switchTab('signup')" style="flex:1;padding:9px;border:none;background:var(--white);color:var(--g500);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">회원가입</button>
     </div>
-    <input type="email" id="auth-email" placeholder="이메일" style="width:100%;margin-bottom:10px;padding:12px 14px;font-size:14px">
-    <input type="password" id="auth-password" placeholder="비밀번호 (6자 이상)" style="width:100%;margin-bottom:16px;padding:12px 14px;font-size:14px" onkeydown="if(event.key==='Enter')doSignIn()">
-    <button class="google-btn" onclick="doSignIn()" id="auth-submit-btn">로그인</button>
+    <input type="email" id="auth-email" placeholder="이메일" style="width:100%;margin-bottom:10px;padding:12px 14px;font-size:14px;border:1.5px solid var(--g200);border-radius:var(--rs)">
+    <input type="password" id="auth-password" placeholder="비밀번호 (6자 이상)" style="width:100%;margin-bottom:16px;padding:12px 14px;font-size:14px;border:1.5px solid var(--g200);border-radius:var(--rs)" onkeydown="if(event.key==='Enter')doSignIn()">
+    <button class="google-btn" id="auth-submit-btn" onclick="doSignIn()">로그인</button>
+    <div style="display:flex;align-items:center;gap:10px;margin:16px 0">
+      <div style="flex:1;height:1px;background:var(--g200)"></div>
+      <span style="font-size:12px;color:var(--g400)">또는</span>
+      <div style="flex:1;height:1px;background:var(--g200)"></div>
+    </div>
+    <button onclick="doAnonymous()" style="width:100%;padding:12px;border:1.5px solid var(--g200);border-radius:var(--rs);background:var(--white);font-size:13px;font-weight:600;color:var(--g600);cursor:pointer;font-family:var(--font)">👤 익명으로 시작</button>
     <p class="auth-note">로그인하면 모든 공부 데이터가 클라우드에 저장되며<br>어디서든 불러올 수 있습니다.</p>
   </div>
 </div>
@@ -551,7 +557,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInAnonymously,
   signOut as fbSignOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
@@ -640,10 +646,10 @@ window.doSignIn = async () => {
   const password = document.getElementById('auth-password').value;
   if (!email || !password) { notify('이메일과 비밀번호를 입력하세요'); return; }
   try {
-    if (authMode === 'login') {
-      await signInWithEmailAndPassword(auth, email, password);
-    } else {
+    if (authMode === 'signup') {
       await createUserWithEmailAndPassword(auth, email, password);
+    } else {
+      await signInWithEmailAndPassword(auth, email, password);
     }
   } catch(e) {
     const msgs = {
@@ -656,6 +662,11 @@ window.doSignIn = async () => {
     };
     notify(msgs[e.code] || '오류: ' + e.message);
   }
+};
+
+window.doAnonymous = async () => {
+  try { await signInAnonymously(auth); }
+  catch(e) { notify('익명 로그인 실패: ' + e.message); }
 };
 
 window.doSignOut = async () => {
@@ -1284,4 +1295,4 @@ function renderPosts(posts) {
 }
 </script>
 </body>
-  </html>
+</html>
