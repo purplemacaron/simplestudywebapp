@@ -628,6 +628,12 @@ const fsColUpd = async (col, id, data) =>
 // ═══════════════════════════════════════════════════════
 const provider = new GoogleAuthProvider();
 
+getRedirectResult(auth).then(result => {
+  if (result?.user) {
+    // 로그인 성공 - onAuthStateChanged가 처리
+  }
+}).catch(e => notify('로그인 실패: ' + e.message));
+
 window.doSignIn = async () => {
   try { await signInWithRedirect(auth, provider); }
   catch(e) { notify('로그인 실패: '+e.message); }
