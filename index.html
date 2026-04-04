@@ -1,29 +1,22 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta name="google-site-verification" content="ShBscPwuzTCbH9_PpioXPI2FqzxbspmYnwg00fTAtGY" />
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>심플스터디</title>
+<title>SimpleStudy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/fabric@5.3.0/dist/fabric.min.js"></script>
-
-<!-- ═══════════════════════════════════════════════════════
-  FIREBASE CONFIG
-  Firebase Console → 프로젝트 설정 → 내 앱 → 구성 → 아래 값 전부 교체
-═══════════════════════════════════════════════════════ -->
 <script>
 window.FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyBhFXOPpDmuvk4bCueR0R1TpCNvWM3He1Y",
-  authDomain: "simplestudywebapp.firebaseapp.com",
-  projectId:         "simplestudywebapp",
-  storageBucket:     "simplestudywebapp.firebasestorage.app",
-  messagingSenderId: "341614199675",
-  appId:             "1:341614199675:web:0c09815e860b365f05f3de"
+  apiKey:"AIzaSyBhFXOPpDmuvk4bCueR0R1TpCNvWM3He1Y",
+  authDomain:"simplestudywebapp.firebaseapp.com",
+  projectId:"simplestudywebapp",
+  storageBucket:"simplestudywebapp.firebasestorage.app",
+  messagingSenderId:"341614199675",
+  appId:"1:341614199675:web:0c09815e860b365f05f3de"
 };
 </script>
-
 <style>
 :root{
   --b50:#eff6ff;--b100:#dbeafe;--b200:#bfdbfe;--b300:#93c5fd;
@@ -32,48 +25,30 @@ window.FIREBASE_CONFIG = {
   --g400:#94a3b8;--g500:#64748b;--g600:#475569;--g700:#334155;
   --g800:#1e293b;--g900:#0f172a;
   --white:#fff;--red:#ef4444;--green:#22c55e;--amber:#f59e0b;
-  --font:'Noto Sans KR',sans-serif;
-  --r:12px;--rs:8px;
+  --font:'Noto Sans KR',sans-serif;--r:12px;--rs:8px;
   --sh:0 1px 3px rgba(0,0,0,.06),0 2px 8px rgba(0,0,0,.04);
   --shm:0 4px 20px rgba(37,99,235,.10),0 1px 4px rgba(0,0,0,.06);
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:100vh;-webkit-font-smoothing:antialiased}
-
-/* NAV */
-nav{background:var(--white);border-bottom:1px solid var(--g200);display:flex;align-items:center;
-  padding:0 20px;height:56px;gap:4px;position:sticky;top:0;z-index:200}
-.nav-logo{font-size:15px;font-weight:700;color:var(--b600);letter-spacing:-.5px;margin-right:12px;
-  white-space:nowrap;cursor:pointer;text-decoration:none}
+nav{background:var(--white);border-bottom:1px solid var(--g200);display:flex;align-items:center;padding:0 20px;height:56px;gap:4px;position:sticky;top:0;z-index:200;overflow-x:auto}
+.nav-logo{font-size:15px;font-weight:700;color:var(--b600);letter-spacing:-.5px;margin-right:12px;white-space:nowrap;cursor:pointer;text-decoration:none;flex-shrink:0}
 .nav-logo span{color:var(--g800)}
-.nav-btn{padding:7px 13px;border:none;background:none;border-radius:var(--rs);cursor:pointer;
-  font-size:13px;font-weight:500;color:var(--g500);transition:all .15s;font-family:var(--font);white-space:nowrap}
+.nav-btn{padding:7px 13px;border:none;background:none;border-radius:var(--rs);cursor:pointer;font-size:13px;font-weight:500;color:var(--g500);transition:all .15s;font-family:var(--font);white-space:nowrap;flex-shrink:0}
 .nav-btn:hover{background:var(--b50);color:var(--b600)}
 .nav-btn.active{background:var(--b600);color:var(--white)}
 .nav-spacer{flex:1}
-.badge{font-size:11px;padding:2px 8px;border-radius:99px;font-weight:600}
+.badge{font-size:11px;padding:2px 8px;border-radius:99px;font-weight:600;flex-shrink:0}
 .badge-admin{background:var(--b600);color:#fff}
 .badge-user{background:var(--g100);color:var(--g500);border:1px solid var(--g200)}
-.auth-btn{padding:6px 14px;border-radius:var(--rs);border:1.5px solid var(--g200);background:var(--white);
-  cursor:pointer;font-size:12px;font-weight:600;color:var(--g600);font-family:var(--font);
-  display:inline-flex;align-items:center;gap:6px;transition:all .15s;margin-left:8px}
+.auth-btn{padding:6px 14px;border-radius:var(--rs);border:1.5px solid var(--g200);background:var(--white);cursor:pointer;font-size:12px;font-weight:600;color:var(--g600);font-family:var(--font);display:inline-flex;align-items:center;gap:6px;transition:all .15s;margin-left:8px;flex-shrink:0}
 .auth-btn:hover{border-color:var(--b300);color:var(--b600);background:var(--b50)}
-
-/* PAGE */
 .page{display:none;padding:24px 20px;max-width:980px;margin:0 auto}
 .page.active{display:block}
-
-/* CARD */
-.card{background:var(--white);border-radius:var(--r);padding:22px 24px;
-  border:1px solid var(--g200);margin-bottom:16px;box-shadow:var(--sh)}
-.card-title{font-size:13px;font-weight:700;color:var(--g500);margin-bottom:18px;
-  display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.5px}
+.card{background:var(--white);border-radius:var(--r);padding:22px 24px;border:1px solid var(--g200);margin-bottom:16px;box-shadow:var(--sh)}
+.card-title{font-size:13px;font-weight:700;color:var(--g500);margin-bottom:18px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.5px}
 .card-title svg{color:var(--b400);flex-shrink:0}
-
-/* BTN */
-.btn{padding:9px 18px;border-radius:var(--rs);border:1.5px solid var(--g200);background:var(--white);
-  cursor:pointer;font-size:13px;font-weight:500;color:var(--g700);transition:all .15s;
-  font-family:var(--font);line-height:1;display:inline-flex;align-items:center;gap:6px}
+.btn{padding:9px 18px;border-radius:var(--rs);border:1.5px solid var(--g200);background:var(--white);cursor:pointer;font-size:13px;font-weight:500;color:var(--g700);transition:all .15s;font-family:var(--font);line-height:1;display:inline-flex;align-items:center;gap:6px}
 .btn:hover{background:var(--g50);border-color:var(--g300)}
 .btn:active{transform:scale(.98)}
 .btn.primary{background:var(--b600);color:#fff;border-color:var(--b600)}
@@ -85,120 +60,72 @@ nav{background:var(--white);border-bottom:1px solid var(--g200);display:flex;ali
 .btn.sm{padding:6px 12px;font-size:12px}
 .btn.xs{padding:4px 9px;font-size:11px}
 .btn-group{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-
-/* INPUTS */
-input[type=time],input[type=text],input[type=number],textarea,select{
-  padding:9px 12px;border:1.5px solid var(--g200);border-radius:var(--rs);
-  font-size:13px;outline:none;transition:border-color .15s;background:var(--white);
-  color:var(--g800);font-family:var(--font)}
+input[type=time],input[type=text],input[type=number],textarea,select{padding:9px 12px;border:1.5px solid var(--g200);border-radius:var(--rs);font-size:13px;outline:none;transition:border-color .15s;background:var(--white);color:var(--g800);font-family:var(--font)}
 input:focus,textarea:focus,select:focus{border-color:var(--b400)}
 textarea{resize:vertical;min-height:80px;line-height:1.6}
-
-/* AUTH SCREEN */
-#auth-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--b50),var(--white) 60%,var(--b100));
-  display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
-.auth-box{background:var(--white);border-radius:20px;padding:48px 40px;max-width:380px;width:100%;
-  text-align:center;box-shadow:0 24px 64px rgba(37,99,235,.12),0 4px 16px rgba(0,0,0,.06);border:1px solid var(--b100)}
+#auth-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--b50),var(--white) 60%,var(--b100));display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.auth-box{background:var(--white);border-radius:20px;padding:48px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 24px 64px rgba(37,99,235,.12),0 4px 16px rgba(0,0,0,.06);border:1px solid var(--b100)}
 .auth-logo{font-size:22px;font-weight:700;color:var(--b600);letter-spacing:-.5px;margin-bottom:8px}
 .auth-logo span{color:var(--g800)}
 .auth-desc{font-size:14px;color:var(--g400);margin-bottom:36px;line-height:1.6}
-.google-btn{width:100%;padding:14px 20px;border-radius:var(--rs);border:1.5px solid var(--g200);
-  background:var(--white);cursor:pointer;font-size:14px;font-weight:600;color:var(--g700);
-  font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:10px;
-  transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.google-btn{width:100%;padding:14px 20px;border-radius:var(--rs);border:1.5px solid var(--g200);background:var(--white);cursor:pointer;font-size:14px;font-weight:600;color:var(--g700);font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .google-btn:hover{border-color:var(--b300);box-shadow:0 4px 16px rgba(37,99,235,.12);transform:translateY(-1px)}
 .auth-note{font-size:11px;color:var(--g300);margin-top:20px;line-height:1.6}
-
-/* LOADING */
-#loading-screen{position:fixed;inset:0;background:var(--white);display:flex;align-items:center;
-  justify-content:center;z-index:2000;flex-direction:column;gap:16px}
-.spin{display:inline-block;width:20px;height:20px;border:2px solid var(--b100);
-  border-top-color:var(--b500);border-radius:50%;animation:spin .6s linear infinite}
+#banned-screen{position:fixed;inset:0;background:linear-gradient(135deg,#fee2e2,var(--white));display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+#loading-screen{position:fixed;inset:0;background:var(--white);display:flex;align-items:center;justify-content:center;z-index:2000;flex-direction:column;gap:16px}
+.spin{display:inline-block;width:20px;height:20px;border:2px solid var(--b100);border-top-color:var(--b500);border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #loading-screen .ll{font-size:18px;font-weight:700;color:var(--b600)}
 #loading-screen .ll span{color:var(--g800)}
-
-/* NOTIF */
-.notif{position:fixed;top:68px;right:20px;background:var(--g900);color:#fff;padding:11px 18px;
-  border-radius:10px;font-size:13px;z-index:999;opacity:0;transform:translateY(-8px) translateX(8px);
-  transition:.25s cubic-bezier(.16,1,.3,1);pointer-events:none;max-width:280px;line-height:1.4;
-  box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.notif{position:fixed;top:68px;right:20px;background:var(--g900);color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;z-index:999;opacity:0;transform:translateY(-8px) translateX(8px);transition:.25s cubic-bezier(.16,1,.3,1);pointer-events:none;max-width:280px;line-height:1.4;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 .notif.show{opacity:1;transform:translateY(0) translateX(0)}
-
-/* POMO */
 .timer-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:640px){.timer-grid{grid-template-columns:1fr}}
-
-.pomo-cycle-bar{background:linear-gradient(135deg,var(--b50),var(--b100));border:1px solid var(--b200);
-  border-radius:var(--r);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.pomo-cycle-bar{background:linear-gradient(135deg,var(--b50),var(--b100));border:1px solid var(--b200);border-radius:var(--r);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .cycle-label{font-size:11px;font-weight:700;color:var(--b600);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
 .cycle-dots{display:flex;gap:6px}
 .cdot{width:11px;height:11px;border-radius:50%;background:var(--b200);transition:.3s}
-.cdot.fd{background:var(--b500)}
-.cdot.rd{background:var(--green)}
+.cdot.fd{background:var(--b500)}.cdot.rd{background:var(--green)}
 .cdot.af{background:var(--b400);box-shadow:0 0 0 3px rgba(59,130,246,.25)}
 .cdot.ar{background:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,.25)}
-
-.pomo-phase{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
-  padding:3px 10px;border-radius:99px;display:inline-block;margin-bottom:12px}
+.pomo-phase{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:3px 10px;border-radius:99px;display:inline-block;margin-bottom:12px}
 .phase-focus{background:var(--b100);color:var(--b700)}
 .phase-rest{background:#dcfce7;color:#15803d}
 .phase-longrest{background:#fef3c7;color:#92400e}
-
 .pomo-settings{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .pomo-settings label{font-size:12px;color:var(--g500);display:flex;align-items:center;gap:5px;white-space:nowrap}
 .pomo-settings input[type=number]{width:48px;text-align:center;padding:6px 8px;font-size:12px}
-
-.timer-display{font-size:60px;font-weight:300;letter-spacing:-3px;text-align:center;
-  font-variant-numeric:tabular-nums;margin:14px 0;color:var(--g900);line-height:1}
+.timer-display{font-size:60px;font-weight:300;letter-spacing:-3px;text-align:center;font-variant-numeric:tabular-nums;margin:14px 0;color:var(--g900);line-height:1}
 .timer-sub{font-size:12px;color:var(--g400);text-align:center;margin-bottom:14px}
 .ring-wrap{display:flex;justify-content:center;margin:4px 0}
-
-/* stats */
 .stats-row{display:flex;gap:12px}
 .stat-card{flex:1;background:var(--b50);border-radius:var(--rs);padding:14px;text-align:center;border:1px solid var(--b100)}
 .stat-num{font-size:26px;font-weight:700;color:var(--b600)}
 .stat-label{font-size:11px;color:var(--b400);margin-top:2px;font-weight:500}
-
-/* alarm */
 .alarm-form{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.alarm-item{display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px;background:var(--g50);border-radius:var(--rs);border:1px solid var(--g100);margin-bottom:8px}
+.alarm-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--g50);border-radius:var(--rs);border:1px solid var(--g100);margin-bottom:8px}
 .alarm-time{font-size:22px;font-weight:600}
 .alarm-label-text{font-size:12px;color:var(--g400);margin-top:2px}
-.toggle{width:44px;height:24px;background:var(--g300);border-radius:12px;cursor:pointer;
-  position:relative;transition:.2s;border:none;flex-shrink:0}
+.toggle{width:44px;height:24px;background:var(--g300);border-radius:12px;cursor:pointer;position:relative;transition:.2s;border:none;flex-shrink:0}
 .toggle.on{background:var(--b500)}
-.toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;
-  border-radius:50%;top:3px;left:3px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .toggle.on::after{left:23px}
-
-/* TODO */
 .todo-form{display:flex;gap:8px;margin-bottom:14px}
 .todo-form input{flex:1}
 .todo-bar{height:4px;background:var(--g100);border-radius:99px;margin-bottom:14px;overflow:hidden}
 .todo-fill{height:100%;background:linear-gradient(90deg,var(--b400),var(--b600));border-radius:99px;transition:width .4s}
-.todo-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--g50);
-  border-radius:var(--rs);border:1px solid var(--g100);margin-bottom:6px}
+.todo-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--g50);border-radius:var(--rs);border:1px solid var(--g100);margin-bottom:6px}
 .todo-item.done{opacity:.5}
 .todo-item.done span{text-decoration:line-through}
-.checkbox{width:20px;height:20px;border-radius:6px;border:2px solid var(--g300);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0;font-size:11px;color:transparent}
+.checkbox{width:20px;height:20px;border-radius:6px;border:2px solid var(--g300);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0;font-size:11px;color:transparent}
 .checkbox.checked{background:var(--b500);border-color:var(--b500);color:#fff}
-.todo-del{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--g300);
-  font-size:18px;padding:2px 4px;border-radius:4px;transition:.15s}
+.todo-del{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--g300);font-size:18px;padding:2px 4px;border-radius:4px;transition:.15s}
 .todo-del:hover{color:var(--red);background:#fee2e2}
-
-/* ANNOTATION */
-.upload-area{border:2px dashed var(--g200);border-radius:var(--r);padding:40px;text-align:center;
-  cursor:pointer;transition:.15s;margin-bottom:16px;display:block;color:var(--g500)}
+.upload-area{border:2px dashed var(--g200);border-radius:var(--r);padding:40px;text-align:center;cursor:pointer;transition:.15s;margin-bottom:16px;display:block;color:var(--g500)}
 .upload-area:hover{border-color:var(--b300);background:var(--b50);color:var(--b500)}
 .upload-area input{display:none}
-.tool-bar{display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap;
-  padding:10px 12px;background:var(--g50);border-radius:var(--rs);border:1px solid var(--g200)}
-.tool-btn{width:34px;height:34px;border-radius:6px;border:1.5px solid var(--g200);background:var(--white);
-  cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;
-  transition:.15s;font-family:var(--font);color:var(--g600)}
+.tool-bar{display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap;padding:10px 12px;background:var(--g50);border-radius:var(--rs);border:1px solid var(--g200)}
+.tool-btn{width:34px;height:34px;border-radius:6px;border:1.5px solid var(--g200);background:var(--white);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.15s;font-family:var(--font);color:var(--g600)}
 .tool-btn:hover{background:var(--b50);border-color:var(--b200);color:var(--b600)}
 .tool-btn.active{background:var(--b500);color:#fff;border-color:var(--b500)}
 .color-picker-row{display:flex;gap:5px;align-items:center}
@@ -207,22 +134,15 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
 #canvas-wrap{position:relative;border:1px solid var(--g200);border-radius:var(--rs);overflow:hidden;background:#fff;min-height:300px}
 #canvas-wrap canvas{display:block}
 .size-slider{width:70px;accent-color:var(--b500)}
-
-/* VOCAB */
 .vocab-form{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:14px}
 @media(max-width:500px){.vocab-form{grid-template-columns:1fr}}
 .vocab-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
 .vocab-count{font-size:12px;color:var(--g400);margin-left:auto}
-.vocab-item{display:flex;align-items:center;justify-content:space-between;
-  padding:12px 14px;background:var(--g50);border-radius:var(--rs);border:1px solid var(--g100);gap:8px;margin-bottom:6px}
+.vocab-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--g50);border-radius:var(--rs);border:1px solid var(--g100);gap:8px;margin-bottom:6px}
 .vocab-word{font-size:15px;font-weight:600}
 .vocab-mean{font-size:13px;color:var(--g500);margin-top:2px}
-
-/* QUIZ */
-.quiz-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);
-  z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
-.quiz-modal{background:var(--white);border-radius:20px;padding:32px;max-width:480px;width:100%;
-  box-shadow:0 24px 64px rgba(0,0,0,.18);text-align:center}
+.quiz-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.quiz-modal{background:var(--white);border-radius:20px;padding:32px;max-width:480px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.18);text-align:center}
 .quiz-counter{font-size:12px;color:var(--g400);margin-bottom:14px;font-weight:500}
 .quiz-word{font-size:34px;font-weight:700;color:var(--g900);margin-bottom:20px;letter-spacing:-1px}
 .quiz-input-wrap{display:flex;gap:8px;margin-bottom:14px}
@@ -231,13 +151,9 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
 .quiz-result.correct{background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0}
 .quiz-result.wrong{background:#fee2e2;color:#dc2626;border:1px solid #fecaca}
 .quiz-scorebar{background:var(--g100);border-radius:var(--rs);padding:14px;margin-bottom:16px;display:flex;gap:16px;justify-content:center}
-.qsi{text-align:center}
-.qsn{font-size:24px;font-weight:700}
-.qsn.c{color:var(--green)}
-.qsn.w{color:var(--red)}
+.qsi{text-align:center}.qsn{font-size:24px;font-weight:700}
+.qsn.c{color:var(--green)}.qsn.w{color:var(--red)}
 .qsl{font-size:11px;color:var(--g400);margin-top:2px}
-
-/* COMMUNITY */
 .community-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
 .community-header h2{font-size:18px;font-weight:700}
 .post-form-card{background:var(--white);border-radius:var(--r);padding:20px 22px;border:1px solid var(--g200);margin-bottom:16px;box-shadow:var(--sh)}
@@ -265,23 +181,33 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
 .comment-form input{flex:1;font-size:13px}
 .empty-state{text-align:center;padding:48px 24px;color:var(--g400)}
 .empty-state p{font-size:14px;margin-top:12px}
-
+/* CALENDAR */
+.cal-day{min-height:48px;border-radius:var(--rs);border:1px solid var(--g100);padding:4px;cursor:pointer;transition:.15s;background:var(--white);position:relative}
+.cal-day:hover{border-color:var(--b300);background:var(--b50)}
+.cal-day.today{border-color:var(--b400);background:var(--b50)}
+.cal-day.has-memo::after{content:'';position:absolute;bottom:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--b500)}
+.cal-day.other-month{opacity:.35}
+.cal-day-num{font-size:12px;font-weight:600;margin-bottom:2px}
+/* ADMIN */
+.user-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--g50);border-radius:var(--rs);border:1px solid var(--g100);margin-bottom:8px;gap:8px;flex-wrap:wrap}
+.user-uid{font-size:11px;color:var(--g400);font-family:monospace;word-break:break-all}
+.banned-badge{font-size:11px;padding:2px 8px;border-radius:99px;background:#fee2e2;color:var(--red);font-weight:600;border:1px solid #fecaca}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-box{background:var(--white);border-radius:20px;padding:28px;max-width:420px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.18)}
 @media(max-width:480px){
   .page{padding:16px 14px}.card{padding:16px}.timer-display{font-size:44px}
   nav{padding:0 12px;gap:2px}.nav-btn{padding:6px 9px;font-size:12px}
 }
 </style>
-<meta name="description" content="가장 간단한 공부 웹 앱.">
 </head>
 <body>
 
-<!-- Loading -->
 <div id="loading-screen">
   <div class="ll">Simple<span>Study</span></div>
   <div class="spin"></div>
 </div>
 
-<!-- Auth -->
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo">Simple<span>Study</span></div>
@@ -291,9 +217,17 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
   </div>
 </div>
 
+<div id="banned-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#fee2e2,var(--white));align-items:center;justify-content:center;z-index:1000;padding:20px">
+  <div class="auth-box" style="border-color:#fecaca">
+    <div style="font-size:40px;margin-bottom:16px">🚫</div>
+    <div class="auth-logo" style="color:var(--red)">이용 정지</div>
+    <div class="auth-desc">운영자에 의해 이용이 정지되었습니다.<br>문의사항은 커뮤니티를 통해 연락해주세요.</div>
+    <button class="google-btn" onclick="doSignOut()" style="border-color:#fecaca">로그아웃</button>
+  </div>
+</div>
+
 <div class="notif" id="notif"></div>
 
-<!-- Quiz Overlay -->
 <div class="quiz-overlay" id="quiz-overlay">
   <div class="quiz-modal">
     <div class="quiz-counter" id="quiz-counter">1 / 10</div>
@@ -314,7 +248,19 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
   </div>
 </div>
 
-<!-- NAV -->
+<!-- 달력 메모 모달 -->
+<div class="modal-overlay" id="cal-modal">
+  <div class="modal-box">
+    <div style="font-size:15px;font-weight:700;margin-bottom:16px" id="cal-modal-date"></div>
+    <textarea id="cal-memo-input" placeholder="이 날의 메모를 입력하세요..." style="width:100%;min-height:120px;margin-bottom:12px;font-size:14px"></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="closeCalModal()">취소</button>
+      <button class="btn danger" onclick="delCalMemo()">삭제</button>
+      <button class="btn primary" onclick="saveCalMemo()">저장</button>
+    </div>
+  </div>
+</div>
+
 <nav id="main-nav" style="display:none">
   <span class="nav-logo" onclick="goto('timer',document.querySelectorAll('.nav-btn')[0])">Simple<span>Study</span></span>
   <button class="nav-btn active" onclick="goto('timer',this)">타이머</button>
@@ -322,12 +268,14 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
   <button class="nav-btn" onclick="goto('todo',this)">할일</button>
   <button class="nav-btn" onclick="goto('vocab',this)">단어장</button>
   <button class="nav-btn" onclick="goto('community',this)">커뮤니티</button>
+  <button class="nav-btn" onclick="goto('calendar',this)">달력</button>
+  <button class="nav-btn" id="admin-nav-btn" onclick="goto('admin',this)" style="display:none">차단관리</button>
   <div class="nav-spacer"></div>
   <span class="badge badge-user" id="role-badge">...</span>
   <button class="auth-btn" onclick="doSignOut()">로그아웃</button>
 </nav>
 
-<!-- TIMER PAGE -->
+<!-- TIMER -->
 <div class="page active" id="page-timer">
   <div class="pomo-cycle-bar">
     <div>
@@ -339,7 +287,6 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
       <button class="btn xs" onclick="resetCycleStats()">초기화</button>
     </div>
   </div>
-
   <div class="timer-grid">
     <div class="card">
       <div class="card-title">
@@ -358,9 +305,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
       <div class="ring-wrap">
         <svg width="150" height="150" viewBox="0 0 160 160">
           <circle cx="80" cy="80" r="68" fill="none" stroke="#e2e8f0" stroke-width="8"/>
-          <circle id="pomo-ring" cx="80" cy="80" r="68" fill="none" stroke="#3b82f6" stroke-width="8"
-            stroke-dasharray="427" stroke-dashoffset="0" stroke-linecap="round"
-            transform="rotate(-90 80 80)" style="transition:stroke-dashoffset .5s"/>
+          <circle id="pomo-ring" cx="80" cy="80" r="68" fill="none" stroke="#3b82f6" stroke-width="8" stroke-dasharray="427" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 80 80)" style="transition:stroke-dashoffset .5s"/>
         </svg>
       </div>
       <div class="timer-display" id="pomo-display">25:00</div>
@@ -371,7 +316,6 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
         <button class="btn" onclick="pomoSkip()">건너뛰기</button>
       </div>
     </div>
-
     <div style="display:flex;flex-direction:column;gap:16px">
       <div class="card">
         <div class="card-title">
@@ -406,7 +350,6 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
       </div>
     </div>
   </div>
-
   <div class="card">
     <div class="card-title">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -419,7 +362,6 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
     </div>
     <div id="alarm-list"></div>
   </div>
-
   <div class="card">
     <div class="card-title">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -433,7 +375,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
   </div>
 </div>
 
-<!-- ANNOTATION PAGE -->
+<!-- ANNOTATION -->
 <div class="page" id="page-annotation">
   <div class="card">
     <div class="card-title">
@@ -442,9 +384,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
     </div>
     <label class="upload-area" id="upload-area">
       <input type="file" id="img-upload" accept="image/*" onchange="loadImage(event)">
-      <div style="opacity:.4;margin-bottom:8px">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      </div>
+      <div style="opacity:.4;margin-bottom:8px"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
       <div style="font-size:14px;font-weight:600;margin-bottom:4px">사진 업로드</div>
       <div style="font-size:12px;opacity:.5">클릭하거나 드래그해서 올리세요</div>
     </label>
@@ -478,7 +418,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
   </div>
 </div>
 
-<!-- TODO PAGE -->
+<!-- TODO -->
 <div class="page" id="page-todo">
   <div class="card">
     <div class="card-title">
@@ -495,7 +435,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
   </div>
 </div>
 
-<!-- VOCAB PAGE -->
+<!-- VOCAB -->
 <div class="page" id="page-vocab">
   <div class="card">
     <div class="card-title">
@@ -516,7 +456,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
   </div>
 </div>
 
-<!-- COMMUNITY PAGE -->
+<!-- COMMUNITY -->
 <div class="page" id="page-community">
   <div class="community-header">
     <h2>커뮤니티</h2>
@@ -537,36 +477,51 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
   </div>
 </div>
 
+<!-- CALENDAR -->
+<div class="page" id="page-calendar">
+  <div class="card">
+    <div class="card-title">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      달력
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <button class="btn sm" onclick="calMove(-1)">◀</button>
+      <span id="cal-title" style="font-size:16px;font-weight:700"></span>
+      <button class="btn sm" onclick="calMove(1)">▶</button>
+    </div>
+    <div id="cal-weekdays" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px"></div>
+    <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px"></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="page" id="page-admin">
+  <div class="card">
+    <div class="card-title">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      차단된 사용자
+    </div>
+    <div style="font-size:12px;color:var(--g400);margin-bottom:14px">커뮤니티 게시물·댓글에서 차단 버튼으로 관리하세요.</div>
+    <div id="banned-list"></div>
+  </div>
+</div>
+
 <audio id="alarm-audio" preload="auto"></audio>
 
-<!-- ═══════════════════════════════════════════════════════
-  ALL LOGIC — type="module" so Firebase ESM imports work
-  HTML 안에서 직접 onclick 쓰려면 window에 함수 등록 필요
-═══════════════════════════════════════════════════════ -->
 <script type="module">
-import { initializeApp }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getAuth, signInAnonymously,
-  signOut as fbSignOut, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {
-  getFirestore, collection, doc, addDoc, getDocs,
-  deleteDoc, updateDoc, onSnapshot, query, orderBy,
-  serverTimestamp, getDoc, setDoc, arrayUnion, limit
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously, signOut as fbSignOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, doc, addDoc, getDocs, deleteDoc, updateDoc,
+  onSnapshot, query, orderBy, serverTimestamp, getDoc, setDoc, arrayUnion, limit }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// ── Init ──────────────────────────────────────────────
 const app  = initializeApp(window.FIREBASE_CONFIG);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-// ── App state ─────────────────────────────────────────
-let currentUser = null;
-let isAdmin     = false;
-let postsUnsub  = null;
+let currentUser = null, isAdmin = false, postsUnsub = null;
 
-// ── Utils ─────────────────────────────────────────────
 const pad    = n => String(n).padStart(2,'0');
 const esc    = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const notify = msg => {
@@ -576,55 +531,35 @@ const notify = msg => {
 };
 const timeAgo = ts => {
   if (!ts) return '';
-  const d    = ts.toDate ? ts.toDate() : new Date(ts);
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
   const diff = (Date.now()-d)/1000;
-  if (diff<60)    return '방금';
-  if (diff<3600)  return Math.floor(diff/60)+'분 전';
+  if (diff<60) return '방금';
+  if (diff<3600) return Math.floor(diff/60)+'분 전';
   if (diff<86400) return Math.floor(diff/3600)+'시간 전';
   return d.toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
 };
 
-// ── Goto (exposed to HTML) ────────────────────────────
 window.goto = (page, btn) => {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   if (btn) btn.classList.add('active');
   if (page==='community') initCommunity();
+  if (page==='calendar') renderCalendar();
+  if (page==='admin') renderBannedList();
 };
 
-// ── Firestore helpers ─────────────────────────────────
 const userDoc = path => doc(db, `users/${currentUser.uid}/${path}`);
 const userCol = path => collection(db, `users/${currentUser.uid}/${path}`);
+const fsSet = async (path, data) => { try { await setDoc(userDoc(path), data, {merge:true}); } catch(e){ console.error(e); } };
+const fsGet = async (path, def={}) => { try { const s=await getDoc(userDoc(path)); return s.exists()?s.data():def; } catch { return def; } };
+const fsColAdd = async (col, data) => addDoc(userCol(col), {...data, createdAt:serverTimestamp()});
+const fsColDel = async (col, id) => deleteDoc(doc(db, `users/${currentUser.uid}/${col}/${id}`));
+const fsColGet = async col => { const s=await getDocs(userCol(col)); return s.docs.map(d=>({id:d.id,...d.data()})); };
+const fsColUpd = async (col, id, data) => updateDoc(doc(db, `users/${currentUser.uid}/${col}/${id}`), data);
 
-const fsSet = async (path, data) => {
-  try { await setDoc(userDoc(path), data, {merge:true}); } catch(e){ console.error(e); }
-};
-const fsGet = async (path, def={}) => {
-  try {
-    const s = await getDoc(userDoc(path));
-    return s.exists() ? s.data() : def;
-  } catch { return def; }
-};
-const fsColAdd = async (col, data) =>
-  addDoc(userCol(col), {...data, createdAt:serverTimestamp()});
-const fsColDel = async (col, id) =>
-  deleteDoc(doc(db, `users/${currentUser.uid}/${col}/${id}`));
-const fsColGet = async col => {
-  const s = await getDocs(userCol(col));
-  return s.docs.map(d=>({id:d.id,...d.data()}));
-};
-const fsColUpd = async (col, id, data) =>
-  updateDoc(doc(db, `users/${currentUser.uid}/${col}/${id}`), data);
-
-// ═══════════════════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════════════════
-window.doAnonymous = async () => {
-  try { await signInAnonymously(auth); }
-  catch(e) { notify('오류: ' + e.message); }
-};
-
+// ── AUTH ──
+window.doAnonymous = async () => { try { await signInAnonymously(auth); } catch(e) { notify('오류: '+e.message); } };
 window.doSignOut = async () => {
   if (!confirm('로그아웃하시겠습니까?')) return;
   if (postsUnsub) postsUnsub();
@@ -636,243 +571,195 @@ onAuthStateChanged(auth, async user => {
   if (!user) {
     currentUser = null; isAdmin = false;
     document.getElementById('auth-screen').style.display = 'flex';
-    document.getElementById('main-nav').style.display    = 'none';
+    document.getElementById('banned-screen').style.display = 'none';
+    document.getElementById('main-nav').style.display = 'none';
     document.querySelectorAll('.page').forEach(p => p.style.display='none');
     return;
   }
   currentUser = user;
+
+  // 이용정지 확인
+  try {
+    const banSnap = await getDoc(doc(db,'banned',user.uid));
+    if (banSnap.exists()) {
+      document.getElementById('banned-screen').style.display = 'flex';
+      document.getElementById('main-nav').style.display = 'none';
+      document.querySelectorAll('.page').forEach(p => p.style.display='none');
+      return;
+    }
+  } catch(e) {}
+
+  // 관리자 확인
+  try { const s=await getDoc(doc(db,'admins',user.uid)); isAdmin=s.exists(); } catch { isAdmin=false; }
+
   document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('main-nav').style.display    = 'flex';
+  document.getElementById('banned-screen').style.display = 'none';
+  document.getElementById('main-nav').style.display = 'flex';
   document.querySelectorAll('.page').forEach(p => p.style.display='');
   document.getElementById('page-timer').classList.add('active');
 
-  // Admin check via Firestore (UID never in code)
-  try {
-    const snap = await getDoc(doc(db,'admins',user.uid));
-    isAdmin = snap.exists();
-  } catch { isAdmin = false; }
-
-  const badge = document.getElementById('role-badge');
   if (isAdmin) {
+    document.getElementById('admin-nav-btn').style.display = '';
+    const badge = document.getElementById('role-badge');
     badge.textContent = '운영자'; badge.className = 'badge badge-admin';
   } else {
-    badge.textContent = user.displayName||'사용자'; badge.className = 'badge badge-user';
+    const badge = document.getElementById('role-badge');
+    badge.textContent = '익명'; badge.className = 'badge badge-user';
   }
-  document.getElementById('post-author-label').textContent =
-    isAdmin ? '운영자로 게시됩니다' : '익명으로 게시됩니다';
+  document.getElementById('post-author-label').textContent = isAdmin ? '운영자로 게시됩니다' : '익명으로 게시됩니다';
 
   await loadAllData();
 });
 
 async function loadAllData() {
-  await Promise.all([loadTodos(), loadVocab(), loadAlarms(), loadStats()]);
+  await Promise.all([loadTodos(), loadVocab(), loadAlarms(), loadStats(), loadCalMemos()]);
+  renderCalendar();
 }
 
-// ═══════════════════════════════════════════════════════
-// POMODORO — auto cycle
-// ═══════════════════════════════════════════════════════
-let pomoPhase     = 'focus';
-let pomoLeft      = 0;
-let pomoRunning   = false;
-let pomoInterval  = null;
-let pomoFocusDone = 0;      // within current round
-let pomoCycleTotal = 0;     // lifetime
+// ── ADMIN ──
+window.banUserDirect = async uid => {
+  if (!isAdmin || !uid) return;
+  try {
+    await setDoc(doc(db,'banned',uid), {bannedAt: new Date().toISOString()});
+    notify('차단 완료');
+    renderBannedList();
+  } catch(e) { notify('오류: '+e.message); }
+};
+window.unbanUserById = async uid => {
+  try {
+    await deleteDoc(doc(db,'banned',uid));
+    notify('정지 해제: '+uid);
+    renderBannedList();
+  } catch(e) { notify('오류: '+e.message); }
+};
+async function renderBannedList() {
+  if (!isAdmin) return;
+  try {
+    const snap = await getDocs(collection(db,'banned'));
+    const el = document.getElementById('banned-list');
+    if (snap.empty) { el.innerHTML='<div style="font-size:13px;color:var(--g400)">차단된 사용자 없음</div>'; return; }
+    el.innerHTML = snap.docs.map(d=>`
+      <div class="user-item">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--g700)">익명 사용자</div>
+          <div class="user-uid">${esc(d.id)}</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">${d.data().bannedAt?new Date(d.data().bannedAt).toLocaleString('ko-KR'):''} 차단</div>
+        </div>
+        <button class="btn xs primary" onclick="unbanUserById('${esc(d.id)}')">차단 해제</button>
+      </div>`).join('');
+  } catch(e) { notify('목록 로드 실패'); }
+}
 
+// ── POMODORO ──
+let pomoPhase='focus', pomoLeft=0, pomoRunning=false, pomoInterval=null, pomoFocusDone=0, pomoCycleTotal=0;
 const getTimes = () => ({
-  focus:     (parseInt(document.getElementById('pomo-focus-min').value)||25)*60,
+  focus: (parseInt(document.getElementById('pomo-focus-min').value)||25)*60,
   shortRest: (parseInt(document.getElementById('pomo-short-min').value)||5)*60,
-  longRest:  (parseInt(document.getElementById('pomo-long-min').value)||15)*60,
+  longRest: (parseInt(document.getElementById('pomo-long-min').value)||15)*60,
   cycleCount: parseInt(document.getElementById('pomo-cycle-count').value)||4,
 });
-
-function pomoInit() {
-  const t = getTimes();
-  pomoPhase = 'focus'; pomoLeft = t.focus;
-  updatePomoUI(); renderCycleDots();
-}
-
+function pomoInit() { const t=getTimes(); pomoPhase='focus'; pomoLeft=t.focus; updatePomoUI(); renderCycleDots(); }
 function updatePomoUI() {
-  const m = Math.floor(pomoLeft/60), s = pomoLeft%60;
-  document.getElementById('pomo-display').textContent = pad(m)+':'+pad(s);
-
-  const t = getTimes();
-  const total = pomoPhase==='focus' ? t.focus
-              : pomoPhase==='shortRest' ? t.shortRest : t.longRest;
-  const pct = 1 - pomoLeft/total;
-  document.getElementById('pomo-ring').style.strokeDashoffset = 427*(1-pct);
-  document.getElementById('pomo-ring').style.stroke =
-    pomoPhase==='focus' ? '#3b82f6' : pomoPhase==='shortRest' ? '#22c55e' : '#f59e0b';
-
-  const labels  = {focus:'집중',shortRest:'짧은 휴식',longRest:'긴 휴식'};
-  const classes = {focus:'phase-focus',shortRest:'phase-rest',longRest:'phase-longrest'};
-  const badge   = document.getElementById('pomo-phase-badge');
-  badge.textContent = labels[pomoPhase];
-  badge.className   = 'pomo-phase '+classes[pomoPhase];
-
-  document.getElementById('pomo-status').textContent =
-    pomoRunning ? labels[pomoPhase]+' 진행 중...' : labels[pomoPhase]+' 준비';
-  document.getElementById('pomo-btn').textContent = pomoRunning ? '일시정지' : '시작';
+  const m=Math.floor(pomoLeft/60), s=pomoLeft%60;
+  document.getElementById('pomo-display').textContent=pad(m)+':'+pad(s);
+  const t=getTimes();
+  const total=pomoPhase==='focus'?t.focus:pomoPhase==='shortRest'?t.shortRest:t.longRest;
+  const pct=1-pomoLeft/total;
+  document.getElementById('pomo-ring').style.strokeDashoffset=427*(1-pct);
+  document.getElementById('pomo-ring').style.stroke=pomoPhase==='focus'?'#3b82f6':pomoPhase==='shortRest'?'#22c55e':'#f59e0b';
+  const labels={focus:'집중',shortRest:'짧은 휴식',longRest:'긴 휴식'};
+  const classes={focus:'phase-focus',shortRest:'phase-rest',longRest:'phase-longrest'};
+  const badge=document.getElementById('pomo-phase-badge');
+  badge.textContent=labels[pomoPhase]; badge.className='pomo-phase '+classes[pomoPhase];
+  document.getElementById('pomo-status').textContent=pomoRunning?labels[pomoPhase]+' 진행 중...':labels[pomoPhase]+' 준비';
+  document.getElementById('pomo-btn').textContent=pomoRunning?'일시정지':'시작';
 }
-
 function renderCycleDots() {
-  const t = getTimes();
-  const dots = document.getElementById('cycle-dots');
-  dots.innerHTML = '';
-  for (let i=0; i<t.cycleCount; i++) {
-    const d = document.createElement('div');
-    const done       = i < pomoFocusDone;
-    const activeFoc  = i === pomoFocusDone && pomoPhase==='focus' && pomoRunning;
-    const activeRest = i === pomoFocusDone-1 && (pomoPhase==='shortRest'||pomoPhase==='longRest');
-    d.className = 'cdot' + (done?' fd' : activeFoc?' af' : activeRest?' ar' : '');
+  const t=getTimes();
+  const dots=document.getElementById('cycle-dots');
+  dots.innerHTML='';
+  for (let i=0;i<t.cycleCount;i++) {
+    const d=document.createElement('div');
+    const done=i<pomoFocusDone;
+    const activeFoc=i===pomoFocusDone&&pomoPhase==='focus'&&pomoRunning;
+    const activeRest=i===pomoFocusDone-1&&(pomoPhase==='shortRest'||pomoPhase==='longRest');
+    d.className='cdot'+(done?' fd':activeFoc?' af':activeRest?' ar':'');
     dots.appendChild(d);
   }
-  const t2 = getTimes();
-  document.getElementById('cycle-round').textContent = Math.floor(pomoCycleTotal/t2.cycleCount)+1;
-  document.getElementById('cycle-total').textContent = pomoCycleTotal;
-  document.getElementById('stat-pomo').textContent   = pomoCycleTotal;
+  document.getElementById('cycle-round').textContent=Math.floor(pomoCycleTotal/t.cycleCount)+1;
+  document.getElementById('cycle-total').textContent=pomoCycleTotal;
+  document.getElementById('stat-pomo').textContent=pomoCycleTotal;
 }
-
-window.pomoToggle = () => {
-  if (!pomoLeft) pomoInit();
-  pomoRunning = !pomoRunning;
-  updatePomoUI(); renderCycleDots();
-  if (pomoRunning) {
-    pomoInterval = setInterval(()=>{ if(pomoLeft<=0){pomoPhaseComplete();return;} pomoLeft--; updatePomoUI(); savePomoState(); }, 1000);
-  } else {
-    clearInterval(pomoInterval); savePomoState();
-  }
-};
-
-function savePomoState() {
-  localStorage.setItem('ss_pomo', JSON.stringify({pomoPhase, pomoLeft, pomoFocusDone, pomoCycleTotal}));
-}
+function savePomoState() { localStorage.setItem('ss_pomo',JSON.stringify({pomoPhase,pomoLeft,pomoFocusDone,pomoCycleTotal})); }
 function loadPomoState() {
   try {
-    const s = JSON.parse(localStorage.getItem('ss_pomo'));
-    if (!s) return;
+    const s=JSON.parse(localStorage.getItem('ss_pomo'));
+    if(!s) return;
     pomoPhase=s.pomoPhase; pomoLeft=s.pomoLeft; pomoFocusDone=s.pomoFocusDone; pomoCycleTotal=s.pomoCycleTotal;
     updatePomoUI(); renderCycleDots();
-    // 자동 재시작
-    pomoRunning = true;
-    pomoInterval = setInterval(()=>{ if(pomoLeft<=0){pomoPhaseComplete();return;} pomoLeft--; updatePomoUI(); savePomoState(); }, 1000);
+    pomoRunning=true;
+    pomoInterval=setInterval(()=>{ if(pomoLeft<=0){pomoPhaseComplete();return;} pomoLeft--; updatePomoUI(); savePomoState(); },1000);
   } catch(e) {}
 }
-
+window.pomoToggle = () => {
+  if(!pomoLeft) pomoInit();
+  pomoRunning=!pomoRunning; updatePomoUI(); renderCycleDots();
+  if(pomoRunning) { pomoInterval=setInterval(()=>{ if(pomoLeft<=0){pomoPhaseComplete();return;} pomoLeft--; updatePomoUI(); savePomoState(); },1000); }
+  else { clearInterval(pomoInterval); savePomoState(); }
+};
 function pomoPhaseComplete() {
-  clearInterval(pomoInterval); pomoRunning = false;
-  playBeep();
-  const t = getTimes();
-  if (pomoPhase === 'focus') {
-    pomoFocusDone++; pomoCycleTotal++;
-    savePomodoroStat(pomoCycleTotal);
-    if (pomoFocusDone >= t.cycleCount) {
-      notify('사이클 완료! 긴 휴식 시간입니다');
-      pomoPhase = 'longRest'; pomoLeft = t.longRest; pomoFocusDone = 0;
-    } else {
-      notify('집중 완료! 짧은 휴식 시간입니다');
-      pomoPhase = 'shortRest'; pomoLeft = t.shortRest;
-    }
-  } else {
-    notify('휴식 끝! 다음 집중을 시작합니다');
-    pomoPhase = 'focus'; pomoLeft = t.focus;
-  }
+  clearInterval(pomoInterval); pomoRunning=false; playBeep();
+  const t=getTimes();
+  if(pomoPhase==='focus') {
+    pomoFocusDone++; pomoCycleTotal++; savePomodoroStat(pomoCycleTotal);
+    if(pomoFocusDone>=t.cycleCount) { notify('사이클 완료! 긴 휴식 시간입니다'); pomoPhase='longRest'; pomoLeft=t.longRest; pomoFocusDone=0; }
+    else { notify('집중 완료! 짧은 휴식 시간입니다'); pomoPhase='shortRest'; pomoLeft=t.shortRest; }
+  } else { notify('휴식 끝! 다음 집중을 시작합니다'); pomoPhase='focus'; pomoLeft=t.focus; }
   updatePomoUI(); renderCycleDots();
-  // auto-advance after 1.5s
-  setTimeout(()=>{
-    pomoRunning = true; updatePomoUI(); renderCycleDots();
-    pomoInterval = setInterval(()=>{ if(pomoLeft<=0){pomoPhaseComplete();return;} pomoLeft--; updatePomoUI(); }, 1000);
-  }, 1500);
+  setTimeout(()=>{ pomoRunning=true; updatePomoUI(); renderCycleDots(); pomoInterval=setInterval(()=>{ if(pomoLeft<=0){pomoPhaseComplete();return;} pomoLeft--; updatePomoUI(); savePomoState(); },1000); },1500);
 }
-
-window.pomoReset = () => {
-  clearInterval(pomoInterval); pomoRunning = false; pomoFocusDone = 0;
-  localStorage.removeItem('ss_pomo'); pomoInit();
-};
-window.pomoSkip  = () => { pomoLeft = 0; };
-window.resetCycleStats = () => {
-  pomoCycleTotal = 0; pomoFocusDone = 0; renderCycleDots(); notify('통계 초기화');
-};
-async function savePomodoroStat(total) {
-  if (!currentUser) return;
-  await fsSet('stats/pomodoro', {total, updatedAt: new Date().toISOString()});
-}
-
-// 포모도로 설정 바뀌면 즉시 반영
+window.pomoReset = () => { clearInterval(pomoInterval); pomoRunning=false; pomoFocusDone=0; localStorage.removeItem('ss_pomo'); pomoInit(); };
+window.pomoSkip = () => { pomoLeft=0; };
+window.resetCycleStats = () => { pomoCycleTotal=0; pomoFocusDone=0; renderCycleDots(); notify('통계 초기화'); };
+async function savePomodoroStat(total) { if(!currentUser) return; await fsSet('stats/pomodoro',{total,updatedAt:new Date().toISOString()}); }
 ['pomo-focus-min','pomo-short-min','pomo-long-min','pomo-cycle-count'].forEach(id=>{
-  document.getElementById(id).addEventListener('input',()=>{
-    if(!pomoRunning) pomoInit();
-  });
+  document.getElementById(id).addEventListener('input',()=>{ if(!pomoRunning) pomoInit(); });
 });
+if(localStorage.getItem('ss_pomo')) { loadPomoState(); } else { pomoInit(); }
 
-if (localStorage.getItem('ss_pomo')) { loadPomoState(); } else { pomoInit(); }
-
-// ═══════════════════════════════════════════════════════
-// COUNTDOWN TIMER
-// ═══════════════════════════════════════════════════════
-let timerLeft = 0, timerRunning = false, timerInterval = null;
+// ── COUNTDOWN TIMER ──
+let timerLeft=0, timerRunning=false, timerInterval=null;
+function timerTick() {
+  if(timerLeft<=0) { clearInterval(timerInterval); timerRunning=false; localStorage.removeItem('ss_timer'); playBeep(); notify('타이머 종료!'); document.getElementById('timer-btn').textContent='시작'; return; }
+  timerLeft--;
+  const h=Math.floor(timerLeft/3600),m=Math.floor((timerLeft%3600)/60),s=timerLeft%60;
+  document.getElementById('timer-display').textContent=(h?pad(h)+':':'')+pad(m)+':'+pad(s);
+  localStorage.setItem('ss_timer',timerLeft);
+}
 window.timerToggle = () => {
-  if (!timerRunning) {
+  if(!timerRunning) {
     const h=parseInt(document.getElementById('timer-h').value)||0;
     const m=parseInt(document.getElementById('timer-m').value)||0;
     const s=parseInt(document.getElementById('timer-s').value)||0;
-    if (!timerLeft) timerLeft = h*3600+m*60+s;
-    if (!timerLeft) return;
+    if(!timerLeft) timerLeft=h*3600+m*60+s;
+    if(!timerLeft) return;
   }
-  timerRunning = !timerRunning;
-  document.getElementById('timer-btn').textContent = timerRunning?'일시정지':'시작';
-  if (timerRunning) {
-    timerInterval = setInterval(()=>{
-      if (timerLeft<=0) {
-        clearInterval(timerInterval); timerRunning=false;
-        localStorage.removeItem('ss_timer');
-        playBeep(); notify('타이머 종료!');
-        document.getElementById('timer-btn').textContent='시작'; return;
-      }
-      timerLeft--;
-      const h=Math.floor(timerLeft/3600),m=Math.floor((timerLeft%3600)/60),s=timerLeft%60;
-      document.getElementById('timer-display').textContent=(h?pad(h)+':':'')+pad(m)+':'+pad(s);
-      localStorage.setItem('ss_timer', timerLeft);
-    },1000);
-  } else { clearInterval(timerInterval); localStorage.setItem('ss_timer', timerLeft); }
+  timerRunning=!timerRunning;
+  document.getElementById('timer-btn').textContent=timerRunning?'일시정지':'시작';
+  if(timerRunning) { timerInterval=setInterval(timerTick,1000); }
+  else { clearInterval(timerInterval); localStorage.setItem('ss_timer',timerLeft); }
 };
 window.timerReset = () => {
-  clearInterval(timerInterval); timerRunning=false; timerLeft=0;
-  localStorage.removeItem('ss_timer');
+  clearInterval(timerInterval); timerRunning=false; timerLeft=0; localStorage.removeItem('ss_timer');
   document.getElementById('timer-btn').textContent='시작';
   const h=parseInt(document.getElementById('timer-h').value)||0;
   const m=parseInt(document.getElementById('timer-m').value)||0;
   const s=parseInt(document.getElementById('timer-s').value)||0;
   document.getElementById('timer-display').textContent=(h?pad(h)+':':'')+pad(m)+':'+pad(s);
 };
-
-// 타이머 복원
-(()=>{
-  const saved = localStorage.getItem('ss_timer');
-  if (saved) {
-    timerLeft = parseInt(saved);
-    const h=Math.floor(timerLeft/3600),m=Math.floor((timerLeft%3600)/60),s=timerLeft%60;
-    document.getElementById('timer-display').textContent=(h?pad(h)+':':'')+pad(m)+':'+pad(s);
-    timerRunning = true;
-    document.getElementById('timer-btn').textContent='일시정지';
-    timerInterval = setInterval(()=>{
-      if (timerLeft<=0) {
-        clearInterval(timerInterval); timerRunning=false;
-        localStorage.removeItem('ss_timer');
-        playBeep(); notify('타이머 종료!');
-        document.getElementById('timer-btn').textContent='시작'; return;
-      }
-      timerLeft--;
-      const h=Math.floor(timerLeft/3600),m=Math.floor((timerLeft%3600)/60),s=timerLeft%60;
-      document.getElementById('timer-display').textContent=(h?pad(h)+':':'')+pad(m)+':'+pad(s);
-      localStorage.setItem('ss_timer', timerLeft);
-    },1000);
-  }
-})();
-
-// 타이머 입력값 바뀌면 즉시 표시 업데이트
 ['timer-h','timer-m','timer-s'].forEach(id=>{
   document.getElementById(id).addEventListener('input',()=>{
-    if(!timerRunning){
+    if(!timerRunning) {
       timerLeft=0;
       const h=parseInt(document.getElementById('timer-h').value)||0;
       const m=parseInt(document.getElementById('timer-m').value)||0;
@@ -881,30 +768,33 @@ window.timerReset = () => {
     }
   });
 });
+(()=>{
+  const saved=localStorage.getItem('ss_timer');
+  if(saved) {
+    timerLeft=parseInt(saved);
+    const h=Math.floor(timerLeft/3600),m=Math.floor((timerLeft%3600)/60),s=timerLeft%60;
+    document.getElementById('timer-display').textContent=(h?pad(h)+':':'')+pad(m)+':'+pad(s);
+    timerRunning=true; document.getElementById('timer-btn').textContent='일시정지';
+    timerInterval=setInterval(timerTick,1000);
+  }
+})();
 
-// ═══════════════════════════════════════════════════════
-// STOPWATCH
-// ═══════════════════════════════════════════════════════
+// ── STOPWATCH ──
 let swStart=0, swElapsed=0, swRunning=false, swInterval=null, swLaps=[];
 window.swToggle = () => {
-  swRunning = !swRunning;
-  document.getElementById('sw-btn').textContent = swRunning?'일시정지':'시작';
-  if (swRunning) {
-    swStart=Date.now()-swElapsed;
-    swInterval=setInterval(()=>{ swTick(); localStorage.setItem('ss_sw', swElapsed); },100);
-  } else {
-    clearInterval(swInterval); localStorage.setItem('ss_sw', swElapsed);
-  }
+  swRunning=!swRunning; document.getElementById('sw-btn').textContent=swRunning?'일시정지':'시작';
+  if(swRunning) { swStart=Date.now()-swElapsed; swInterval=setInterval(()=>{ swTick(); localStorage.setItem('ss_sw',swElapsed); },100); }
+  else { clearInterval(swInterval); localStorage.setItem('ss_sw',swElapsed); }
 };
 function swTick() {
-  swElapsed = Date.now()-swStart;
+  swElapsed=Date.now()-swStart;
   const h=Math.floor(swElapsed/3600000),m=Math.floor((swElapsed%3600000)/60000),s=Math.floor((swElapsed%60000)/1000);
   document.getElementById('sw-display').textContent=pad(h)+':'+pad(m)+':'+pad(s);
   const totalMin=Math.floor(swElapsed/60000);
   document.getElementById('stat-sw').textContent=pad(Math.floor(totalMin/60))+':'+pad(totalMin%60);
 }
 window.swLap = () => {
-  if (!swRunning) return;
+  if(!swRunning) return;
   const h=Math.floor(swElapsed/3600000),m=Math.floor((swElapsed%3600000)/60000),s=Math.floor((swElapsed%60000)/1000);
   swLaps.push(`랩 ${swLaps.length+1}: ${pad(h)}:${pad(m)}:${pad(s)}`);
   const el=document.getElementById('sw-laps');
@@ -919,46 +809,35 @@ window.swReset = () => {
   document.getElementById('sw-btn').textContent='시작';
   document.getElementById('sw-laps').innerHTML='';
 };
-
-// 스톱워치 복원
 (()=>{
-  const saved = localStorage.getItem('ss_sw');
-  if (saved) {
-    swElapsed = parseInt(saved);
-    swTick();
-    swRunning = true;
-    document.getElementById('sw-btn').textContent='일시정지';
-    swStart = Date.now()-swElapsed;
-    swInterval = setInterval(()=>{ swTick(); localStorage.setItem('ss_sw', swElapsed); }, 100);
+  const saved=localStorage.getItem('ss_sw');
+  if(saved) {
+    swElapsed=parseInt(saved); swTick();
+    swRunning=true; document.getElementById('sw-btn').textContent='일시정지';
+    swStart=Date.now()-swElapsed;
+    swInterval=setInterval(()=>{ swTick(); localStorage.setItem('ss_sw',swElapsed); },100);
   }
 })();
 
-// ═══════════════════════════════════════════════════════
-// ALARM
-// ═══════════════════════════════════════════════════════
-let alarms = [];
-setInterval(checkAlarms, 10000);
-
-async function loadAlarms() {
-  const data = await fsGet('data/alarms', {list:[]});
-  alarms = data.list||[]; renderAlarms();
-}
+// ── ALARM ──
+let alarms=[];
+setInterval(checkAlarms,10000);
+async function loadAlarms() { const data=await fsGet('data/alarms',{list:[]}); alarms=data.list||[]; renderAlarms(); }
 async function saveAlarms() { await fsSet('data/alarms',{list:alarms}); }
-
 function renderAlarms() {
-  document.getElementById('alarm-list').innerHTML = alarms.map((a,i)=>`
+  document.getElementById('alarm-list').innerHTML=alarms.map((a,i)=>`
     <div class="alarm-item">
       <div><div class="alarm-time">${a.time}</div><div class="alarm-label-text">${esc(a.label||'알람')}</div></div>
       <div style="display:flex;gap:8px;align-items:center">
         <button class="toggle ${a.on?'on':''}" onclick="toggleAlarm(${i})"></button>
         <button class="btn sm danger" onclick="deleteAlarm(${i})">삭제</button>
       </div>
-    </div>`).join('') || '<div style="font-size:13px;color:var(--g400);padding:8px 0">알람 없음</div>';
+    </div>`).join('')||'<div style="font-size:13px;color:var(--g400);padding:8px 0">알람 없음</div>';
 }
 window.addAlarm = async () => {
   const t=document.getElementById('alarm-time').value;
   const l=document.getElementById('alarm-label').value;
-  if (!t) return;
+  if(!t) return;
   alarms.push({time:t,label:l||'알람',on:true});
   await saveAlarms(); renderAlarms(); notify('알람 추가: '+t);
 };
@@ -969,40 +848,20 @@ function checkAlarms() {
   alarms.forEach(a=>{ if(a.on&&a.time===cur){playBeep(); notify('알람: '+a.label);} });
 }
 
-// ═══════════════════════════════════════════════════════
-// STATS
-// ═══════════════════════════════════════════════════════
-async function loadStats() {
-  const data = await fsGet('stats/pomodoro',{total:0});
-  pomoCycleTotal = data.total||0; renderCycleDots();
-}
+// ── STATS ──
+async function loadStats() { const data=await fsGet('stats/pomodoro',{total:0}); pomoCycleTotal=data.total||0; renderCycleDots(); }
 
-// ═══════════════════════════════════════════════════════
-// BEEP
-// ═══════════════════════════════════════════════════════
+// ── BEEP ──
 function playBeep() {
   try {
     const ctx=new (window.AudioContext||window.webkitAudioContext)();
-    [0,0.3,0.6].forEach(t=>{
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.value=880; o.type='sine';
-      g.gain.setValueAtTime(0.3,ctx.currentTime+t);
-      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.3);
-      o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+0.3);
-    });
+    [0,0.3,0.6].forEach(t=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value=880; o.type='sine'; g.gain.setValueAtTime(0.3,ctx.currentTime+t); g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.3); o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+0.3); });
   } catch(e) {}
 }
 
-// ═══════════════════════════════════════════════════════
-// TODO
-// ═══════════════════════════════════════════════════════
-let todos = [];
-async function loadTodos() {
-  todos = await fsColGet('todos');
-  todos.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-  renderTodos();
-}
+// ── TODO ──
+let todos=[];
+async function loadTodos() { todos=await fsColGet('todos'); todos.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); renderTodos(); }
 function renderTodos() {
   const done=todos.filter(t=>t.done).length, total=todos.length;
   const pct=total?Math.round(done/total*100):0;
@@ -1018,77 +877,40 @@ function renderTodos() {
 }
 window.addTodo = async () => {
   const v=document.getElementById('todo-input').value.trim();
-  if (!v||!currentUser) return;
+  if(!v||!currentUser) return;
   const ref=await fsColAdd('todos',{text:v,done:false});
   todos.unshift({id:ref.id,text:v,done:false}); renderTodos();
   document.getElementById('todo-input').value='';
 };
-window.toggleTodo = async id => {
-  const t=todos.find(x=>x.id===id); if(!t) return;
-  t.done=!t.done; await fsColUpd('todos',id,{done:t.done}); renderTodos();
-};
-window.deleteTodo = async id => {
-  todos=todos.filter(t=>t.id!==id);
-  await fsColDel('todos',id); renderTodos();
-};
+window.toggleTodo = async id => { const t=todos.find(x=>x.id===id); if(!t) return; t.done=!t.done; await fsColUpd('todos',id,{done:t.done}); renderTodos(); };
+window.deleteTodo = async id => { todos=todos.filter(t=>t.id!==id); await fsColDel('todos',id); renderTodos(); };
 
-// ═══════════════════════════════════════════════════════
-// CANVAS / ANNOTATION
-// ═══════════════════════════════════════════════════════
+// ── CANVAS ──
 let canvas=null, currentTool='pen', currentColor='#1e293b', brushSize=3, history=[];
-
 function initCanvas(w,h) {
-  if (canvas) canvas.dispose();
+  if(canvas) canvas.dispose();
   document.getElementById('canvas-wrap').innerHTML='<canvas id="main-canvas"></canvas>';
   canvas=new fabric.Canvas('main-canvas',{width:w,height:h,isDrawingMode:true});
-  canvas.freeDrawingBrush.color=currentColor;
-  canvas.freeDrawingBrush.width=brushSize;
+  canvas.freeDrawingBrush.color=currentColor; canvas.freeDrawingBrush.width=brushSize;
   canvas.on('object:added',()=>{history.push(JSON.stringify(canvas));});
 }
 window.loadImage = e => {
   const file=e.target.files[0]; if(!file) return;
   const reader=new FileReader();
-  reader.onload=ev=>{
-    const img=new Image();
-    img.onload=()=>{
-      const maxW=document.getElementById('canvas-wrap').offsetWidth||800;
-      const scale=Math.min(1,maxW/img.width);
-      const w=Math.round(img.width*scale),h=Math.round(img.height*scale);
-      initCanvas(w,h);
-      fabric.Image.fromURL(ev.target.result,fimg=>{
-        fimg.set({left:0,top:0,scaleX:w/img.width,scaleY:h/img.height,selectable:false,evented:false});
-        canvas.add(fimg); canvas.sendToBack(fimg); canvas.renderAll();
-        document.getElementById('upload-area').style.display='none';
-        document.getElementById('tool-bar').style.display='flex';
-        history=[];
-      });
-    };
-    img.src=ev.target.result;
-  };
+  reader.onload=ev=>{ const img=new Image(); img.onload=()=>{ const maxW=document.getElementById('canvas-wrap').offsetWidth||800; const scale=Math.min(1,maxW/img.width); const w=Math.round(img.width*scale),h=Math.round(img.height*scale); initCanvas(w,h); fabric.Image.fromURL(ev.target.result,fimg=>{ fimg.set({left:0,top:0,scaleX:w/img.width,scaleY:h/img.height,selectable:false,evented:false}); canvas.add(fimg); canvas.sendToBack(fimg); canvas.renderAll(); document.getElementById('upload-area').style.display='none'; document.getElementById('tool-bar').style.display='flex'; history=[]; }); }; img.src=ev.target.result; };
   reader.readAsDataURL(file);
 };
 window.setTool = tool => {
-  currentTool=tool;
-  document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tool-'+tool).classList.add('active');
-  if (!canvas) return;
-  if (tool==='pen') {
-    canvas.isDrawingMode=true; canvas.freeDrawingBrush=new fabric.PencilBrush(canvas);
-    canvas.freeDrawingBrush.color=currentColor; canvas.freeDrawingBrush.width=brushSize;
-  } else if (tool==='highlight') {
-    canvas.isDrawingMode=true; canvas.freeDrawingBrush=new fabric.PencilBrush(canvas);
-    canvas.freeDrawingBrush.color=hexRgba(currentColor,.35); canvas.freeDrawingBrush.width=20;
-  } else if (tool==='erase') {
-    canvas.isDrawingMode=true; canvas.freeDrawingBrush=new fabric.PencilBrush(canvas);
-    canvas.freeDrawingBrush.color='#ffffff'; canvas.freeDrawingBrush.width=20;
-  } else if (tool==='text') {
-    canvas.isDrawingMode=false; canvas.on('mouse:down',addText);
-  } else {
-    canvas.isDrawingMode=false; canvas.off('mouse:down',addText);
-  }
+  currentTool=tool; document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active')); document.getElementById('tool-'+tool).classList.add('active');
+  if(!canvas) return;
+  if(tool==='pen') { canvas.isDrawingMode=true; canvas.freeDrawingBrush=new fabric.PencilBrush(canvas); canvas.freeDrawingBrush.color=currentColor; canvas.freeDrawingBrush.width=brushSize; }
+  else if(tool==='highlight') { canvas.isDrawingMode=true; canvas.freeDrawingBrush=new fabric.PencilBrush(canvas); canvas.freeDrawingBrush.color=hexRgba(currentColor,.35); canvas.freeDrawingBrush.width=20; }
+  else if(tool==='erase') { canvas.isDrawingMode=true; canvas.freeDrawingBrush=new fabric.PencilBrush(canvas); canvas.freeDrawingBrush.color='#ffffff'; canvas.freeDrawingBrush.width=20; }
+  else if(tool==='text') { canvas.isDrawingMode=false; canvas.on('mouse:down',addText); }
+  else { canvas.isDrawingMode=false; canvas.off('mouse:down',addText); }
 };
 function addText(opt) {
-  if (currentTool!=='text') return;
+  if(currentTool!=='text') return;
   const p=canvas.getPointer(opt.e);
   const t=new fabric.IText('텍스트',{left:p.x,top:p.y,fontSize:18,fill:currentColor,fontFamily:'Noto Sans KR,sans-serif'});
   canvas.add(t); canvas.setActiveObject(t); t.enterEditing(); t.selectAll();
@@ -1096,99 +918,41 @@ function addText(opt) {
   document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tool-select').classList.add('active');
 }
-function hexRgba(hex,a) {
-  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
-  return `rgba(${r},${g},${b},${a})`;
-}
-window.setColor = (c,el) => {
-  currentColor=c;
-  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active'));
-  if (el) el.classList.add('active');
-  if (!canvas) return;
-  if (currentTool==='pen') canvas.freeDrawingBrush.color=c;
-  else if (currentTool==='highlight') canvas.freeDrawingBrush.color=hexRgba(c,.35);
-};
-window.setBrushSize = v => {
-  brushSize=parseInt(v); document.getElementById('size-label').textContent=v;
-  if (canvas&&canvas.isDrawingMode) canvas.freeDrawingBrush.width=brushSize;
-};
-window.undoCanvas = () => {
-  if (!canvas||history.length<2) return;
-  history.pop(); canvas.loadFromJSON(history[history.length-1]||'{}',()=>canvas.renderAll());
-};
-window.clearAnnotations = () => {
-  if (!canvas) return;
-  const bg=canvas.getObjects().find(o=>!o.selectable);
-  canvas.clear(); if(bg)canvas.add(bg); canvas.renderAll(); history=[];
-};
-window.saveCanvas = () => {
-  if (!canvas) return;
-  const a=document.createElement('a');
-  a.download='study-note.png'; a.href=canvas.toDataURL({format:'png',quality:1}); a.click();
-  notify('저장 완료!');
-};
+function hexRgba(hex,a) { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},${a})`; }
+window.setColor = (c,el) => { currentColor=c; document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active')); if(el) el.classList.add('active'); if(!canvas) return; if(currentTool==='pen') canvas.freeDrawingBrush.color=c; else if(currentTool==='highlight') canvas.freeDrawingBrush.color=hexRgba(c,.35); };
+window.setBrushSize = v => { brushSize=parseInt(v); document.getElementById('size-label').textContent=v; if(canvas&&canvas.isDrawingMode) canvas.freeDrawingBrush.width=brushSize; };
+window.undoCanvas = () => { if(!canvas||history.length<2) return; history.pop(); canvas.loadFromJSON(history[history.length-1]||'{}',()=>canvas.renderAll()); };
+window.clearAnnotations = () => { if(!canvas) return; const bg=canvas.getObjects().find(o=>!o.selectable); canvas.clear(); if(bg)canvas.add(bg); canvas.renderAll(); history=[]; };
+window.saveCanvas = () => { if(!canvas) return; const a=document.createElement('a'); a.download='study-note.png'; a.href=canvas.toDataURL({format:'png',quality:1}); a.click(); notify('저장 완료!'); };
 const ua=document.getElementById('upload-area');
 ua.addEventListener('dragover',e=>{e.preventDefault();ua.style.borderColor='var(--b300)';});
 ua.addEventListener('dragleave',()=>{ua.style.borderColor='';});
-ua.addEventListener('drop',e=>{
-  e.preventDefault(); ua.style.borderColor='';
-  const file=e.dataTransfer.files[0];
-  if (file&&file.type.startsWith('image/')) {
-    const dt=new DataTransfer(); dt.items.add(file);
-    document.getElementById('img-upload').files=dt.files;
-    window.loadImage({target:{files:dt.files}});
-  }
-});
+ua.addEventListener('drop',e=>{ e.preventDefault(); ua.style.borderColor=''; const file=e.dataTransfer.files[0]; if(file&&file.type.startsWith('image/')){ const dt=new DataTransfer(); dt.items.add(file); document.getElementById('img-upload').files=dt.files; window.loadImage({target:{files:dt.files}}); } });
 
-// ═══════════════════════════════════════════════════════
-// VOCABULARY
-// ═══════════════════════════════════════════════════════
-let vocabList = [];
-let quizOrder=[], quizIdx=0, quizCorrect=0, quizWrong=0, quizAnswered=false;
-
-async function loadVocab() {
-  vocabList = await fsColGet('vocab');
-  vocabList.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-  renderVocab();
-}
+// ── VOCAB ──
+let vocabList=[], quizOrder=[], quizIdx=0, quizCorrect=0, quizWrong=0, quizAnswered=false;
+async function loadVocab() { vocabList=await fsColGet('vocab'); vocabList.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); renderVocab(); }
 function renderVocab() {
   document.getElementById('vocab-count').textContent=`총 ${vocabList.length}개`;
-  document.getElementById('vocab-list').innerHTML = vocabList.length
-    ? vocabList.map(v=>`
-        <div class="vocab-item">
-          <div><div class="vocab-word">${esc(v.word)}</div><div class="vocab-mean">${esc(v.mean)}</div></div>
-          <div><button class="btn xs danger" onclick="deleteVocab('${v.id}')">삭제</button></div>
-        </div>`).join('')
-    : '<div style="font-size:13px;color:var(--g400);padding:12px 0;text-align:center">단어를 추가하세요</div>';
+  document.getElementById('vocab-list').innerHTML=vocabList.length
+    ?vocabList.map(v=>`<div class="vocab-item"><div><div class="vocab-word">${esc(v.word)}</div><div class="vocab-mean">${esc(v.mean)}</div></div><div><button class="btn xs danger" onclick="deleteVocab('${v.id}')">삭제</button></div></div>`).join('')
+    :'<div style="font-size:13px;color:var(--g400);padding:12px 0;text-align:center">단어를 추가하세요</div>';
 }
 window.addVocab = async () => {
-  const w=document.getElementById('vocab-word').value.trim();
-  const m=document.getElementById('vocab-mean').value.trim();
-  if (!w||!m) { notify('단어와 뜻을 모두 입력하세요'); return; }
+  const w=document.getElementById('vocab-word').value.trim(), m=document.getElementById('vocab-mean').value.trim();
+  if(!w||!m) { notify('단어와 뜻을 모두 입력하세요'); return; }
   const ref=await fsColAdd('vocab',{word:w,mean:m});
   vocabList.unshift({id:ref.id,word:w,mean:m}); renderVocab();
-  document.getElementById('vocab-word').value='';
-  document.getElementById('vocab-mean').value='';
-  document.getElementById('vocab-word').focus();
+  document.getElementById('vocab-word').value=''; document.getElementById('vocab-mean').value=''; document.getElementById('vocab-word').focus();
 };
-window.deleteVocab = async id => {
-  vocabList=vocabList.filter(v=>v.id!==id);
-  await fsColDel('vocab',id); renderVocab();
-};
-window.shuffleVocab = () => {
-  for (let i=vocabList.length-1;i>0;i--) {
-    const j=Math.floor(Math.random()*(i+1));
-    [vocabList[i],vocabList[j]]=[vocabList[j],vocabList[i]];
-  }
-  renderVocab(); notify('섞었습니다');
-};
+window.deleteVocab = async id => { vocabList=vocabList.filter(v=>v.id!==id); await fsColDel('vocab',id); renderVocab(); };
+window.shuffleVocab = () => { for(let i=vocabList.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[vocabList[i],vocabList[j]]=[vocabList[j],vocabList[i]];} renderVocab(); notify('섞었습니다'); };
 window.startQuiz = () => {
-  if (!vocabList.length) { notify('단어를 먼저 추가하세요'); return; }
+  if(!vocabList.length) { notify('단어를 먼저 추가하세요'); return; }
   quizIdx=0; quizCorrect=0; quizWrong=0; quizAnswered=false;
   quizOrder=[...Array(vocabList.length).keys()].sort(()=>Math.random()-.5);
   document.getElementById('quiz-overlay').style.display='flex';
-  document.getElementById('quiz-correct').textContent='0';
-  document.getElementById('quiz-wrong').textContent='0';
+  document.getElementById('quiz-correct').textContent='0'; document.getElementById('quiz-wrong').textContent='0';
   showQuizWord();
 };
 function showQuizWord() {
@@ -1202,139 +966,154 @@ function showQuizWord() {
   setTimeout(()=>document.getElementById('quiz-input').focus(),100);
 }
 window.checkAnswer = () => {
-  if (quizAnswered) { nextQuiz(); return; }
-  const input=document.getElementById('quiz-input').value.trim();
-  if (!input) return;
+  if(quizAnswered){nextQuiz();return;}
+  const input=document.getElementById('quiz-input').value.trim(); if(!input) return;
   const correct=vocabList[quizOrder[quizIdx]].mean;
-  const isOk=input===correct
-    ||input.replace(/\s/g,'')===correct.replace(/\s/g,'')
-    ||correct.split(/[,\/,、]/).map(s=>s.trim()).some(s=>s&&input.includes(s));
+  const isOk=input===correct||input.replace(/\s/g,'')===correct.replace(/\s/g,'')||correct.split(/[,\/,、]/).map(s=>s.trim()).some(s=>s&&input.includes(s));
   const el=document.getElementById('quiz-result');
-  if (isOk) { quizCorrect++; el.className='quiz-result correct'; el.textContent='정답! — '+correct; }
-  else      { quizWrong++;  el.className='quiz-result wrong';   el.textContent='오답. 정답: '+correct; }
+  if(isOk){quizCorrect++;el.className='quiz-result correct';el.textContent='정답! — '+correct;}
+  else{quizWrong++;el.className='quiz-result wrong';el.textContent='오답. 정답: '+correct;}
   el.style.display='block';
-  document.getElementById('quiz-correct').textContent=quizCorrect;
-  document.getElementById('quiz-wrong').textContent=quizWrong;
+  document.getElementById('quiz-correct').textContent=quizCorrect; document.getElementById('quiz-wrong').textContent=quizWrong;
   quizAnswered=true;
-  if (quizIdx<quizOrder.length-1) {
-    document.getElementById('quiz-next-btn').style.display='inline-flex';
-  } else {
-    setTimeout(()=>{ notify(`퀴즈 완료! ${quizCorrect}/${quizOrder.length} (${Math.round(quizCorrect/quizOrder.length*100)}%)`); },800);
-  }
+  if(quizIdx<quizOrder.length-1){document.getElementById('quiz-next-btn').style.display='inline-flex';}
+  else{setTimeout(()=>{notify(`퀴즈 완료! ${quizCorrect}/${quizOrder.length} (${Math.round(quizCorrect/quizOrder.length*100)}%)`);},800);}
 };
-window.nextQuiz = () => {
-  quizIdx++;
-  if (quizIdx>=quizOrder.length) { stopQuiz(); return; }
-  showQuizWord();
-};
+window.nextQuiz = () => { quizIdx++; if(quizIdx>=quizOrder.length){stopQuiz();return;} showQuizWord(); };
 window.stopQuiz = () => { document.getElementById('quiz-overlay').style.display='none'; };
-document.getElementById('quiz-overlay').addEventListener('click',e=>{
-  if (e.target===document.getElementById('quiz-overlay')) stopQuiz();
-});
+document.getElementById('quiz-overlay').addEventListener('click',e=>{ if(e.target===document.getElementById('quiz-overlay')) stopQuiz(); });
 
-// ═══════════════════════════════════════════════════════
-// COMMUNITY
-// ═══════════════════════════════════════════════════════
-let communityInited = false;
-
+// ── COMMUNITY ──
+let communityInited=false;
 async function initCommunity() {
-  if (communityInited) return;
-  communityInited = true;
+  if(communityInited) return; communityInited=true;
   document.getElementById('comm-status').textContent='불러오는 중...';
   try {
-    const q = query(collection(db,'posts'), orderBy('createdAt','desc'), limit(50));
-    postsUnsub = onSnapshot(q, snap => {
-      const posts = snap.docs.map(d=>({id:d.id,...d.data()}));
-      renderPosts(posts);
-      document.getElementById('comm-status').textContent=`${posts.length}개`;
-    }, err => { console.error(err); notify('커뮤니티 오류'); });
+    const q=query(collection(db,'posts'),orderBy('createdAt','desc'),limit(50));
+    postsUnsub=onSnapshot(q,snap=>{ const posts=snap.docs.map(d=>({id:d.id,...d.data()})); renderPosts(posts); document.getElementById('comm-status').textContent=`${posts.length}개`; },err=>{console.error(err);notify('커뮤니티 오류');});
   } catch(e) { notify('커뮤니티 로드 실패'); }
 }
-
 window.submitPost = async () => {
   const content=document.getElementById('post-content').value.trim();
-  if (!content||!currentUser) return;
-  try {
-    await addDoc(collection(db,'posts'),{
-      content, uid:currentUser.uid,
-      author:isAdmin?'운영자':'익명', isAdmin,
-      createdAt:serverTimestamp(), comments:[]
-    });
-    document.getElementById('post-content').value='';
-    notify('게시되었습니다');
-  } catch(e) { notify('게시 실패: '+e.message); }
+  if(!content||!currentUser) return;
+  try { await addDoc(collection(db,'posts'),{content,uid:currentUser.uid,author:isAdmin?'운영자':'익명',isAdmin,createdAt:serverTimestamp(),comments:[]}); document.getElementById('post-content').value=''; notify('게시되었습니다'); }
+  catch(e) { notify('게시 실패: '+e.message); }
 };
-
-window.deletePost = async postId => {
-  try { await deleteDoc(doc(db,'posts',postId)); notify('삭제되었습니다'); }
-  catch(e) { notify('삭제 실패'); }
-};
-
+window.deletePost = async postId => { try { await deleteDoc(doc(db,'posts',postId)); notify('삭제되었습니다'); } catch(e) { notify('삭제 실패'); } };
 window.submitComment = async postId => {
-  const input=document.getElementById('comment-input-'+postId);
-  const text=input.value.trim();
-  if (!text||!currentUser) return;
-  try {
-    await updateDoc(doc(db,'posts',postId),{
-      comments: arrayUnion({
-        id: Date.now()+'_'+Math.random().toString(36).slice(2),
-        text, uid:currentUser.uid,
-        author:isAdmin?'운영자':'익명', isAdmin,
-        createdAt:new Date().toISOString()
-      })
-    });
-    input.value='';
-  } catch(e) { notify('댓글 등록 실패'); }
+  const input=document.getElementById('comment-input-'+postId); const text=input.value.trim();
+  if(!text||!currentUser) return;
+  try { await updateDoc(doc(db,'posts',postId),{comments:arrayUnion({id:Date.now()+'_'+Math.random().toString(36).slice(2),text,uid:currentUser.uid,author:isAdmin?'운영자':'익명',isAdmin,createdAt:new Date().toISOString()})}); input.value=''; }
+  catch(e) { notify('댓글 등록 실패'); }
 };
-
-window.deleteComment = async (postId, commentId) => {
-  try {
-    const snap=await getDoc(doc(db,'posts',postId));
-    if (!snap.exists()) return;
-    const comments=(snap.data().comments||[]).filter(c=>c.id!==commentId);
-    await updateDoc(doc(db,'posts',postId),{comments});
-  } catch(e) { notify('댓글 삭제 실패'); }
+window.deleteComment = async (postId,commentId) => {
+  try { const snap=await getDoc(doc(db,'posts',postId)); if(!snap.exists()) return; const comments=(snap.data().comments||[]).filter(c=>c.id!==commentId); await updateDoc(doc(db,'posts',postId),{comments}); }
+  catch(e) { notify('댓글 삭제 실패'); }
 };
-
 function renderPosts(posts) {
   const container=document.getElementById('posts-container');
-  if (!posts.length) {
-    container.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>아직 게시물이 없습니다</p></div>`;
-    return;
-  }
+  if(!posts.length) { container.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>아직 게시물이 없습니다</p></div>`; return; }
   const myUid=currentUser?.uid;
   container.innerHTML=posts.map(p=>{
     const canDel=isAdmin||(p.uid===myUid);
+    const canBan=isAdmin&&p.uid&&!p.isAdmin;
     const comments=p.comments||[];
     const commHtml=comments.map(c=>{
       const cDel=isAdmin||(c.uid===myUid);
+      const cBan=isAdmin&&c.uid&&!c.isAdmin;
       const cTime=c.createdAt?timeAgo(typeof c.createdAt==='string'?{toDate:()=>new Date(c.createdAt)}:c.createdAt):'';
-      return `<div class="comment-item">
-        <div class="comment-meta">
-          <span class="comment-author ${c.isAdmin?'adm':''}">${esc(c.author||'익명')}</span>
-          <span class="comment-time">${cTime}</span>
-          ${cDel?`<button class="comment-del" onclick="deleteComment('${p.id}','${esc(c.id)}')">×</button>`:''}
-        </div>
-        <div class="comment-content">${esc(c.text||'')}</div>
-      </div>`;
+      const cAdminBtns=cBan?`<button class="comment-del" style="color:var(--red)" onclick="deleteComment('${p.id}','${esc(c.id)}');banUserDirect('${esc(c.uid)}')">🚫</button>`:'';
+      const cDelBtn=cDel&&!cBan?`<button class="comment-del" onclick="deleteComment('${p.id}','${esc(c.id)}')">×</button>`:'';
+      return `<div class="comment-item"><div class="comment-meta"><span class="comment-author ${c.isAdmin?'adm':''}">${esc(c.author||'익명')}</span><span class="comment-time">${cTime}</span>${cAdminBtns}${cDelBtn}</div><div class="comment-content">${esc(c.text||'')}</div></div>`;
     }).join('');
-    return `<div class="post-card">
-      <div class="post-meta">
-        <span class="post-author ${p.isAdmin?'adm':''}">${esc(p.author||'익명')}</span>
-        <span class="post-time">${p.createdAt?timeAgo(p.createdAt):''}</span>
-        ${canDel?`<button class="post-del" onclick="deletePost('${p.id}')">×</button>`:''}
-      </div>
-      <div class="post-content">${esc(p.content||'')}</div>
-      <div class="comments-section">
-        ${commHtml}
-        <div class="comment-form">
-          <input type="text" id="comment-input-${p.id}" placeholder="댓글 달기..." onkeydown="if(event.key==='Enter')submitComment('${p.id}')">
-          <button class="btn sm primary" onclick="submitComment('${p.id}')">등록</button>
-        </div>
-      </div>
-    </div>`;
+    const adminBtns=canBan?`<button class="post-del" style="color:var(--red)" onclick="deletePost('${p.id}');banUserDirect('${esc(p.uid)}')">🚫</button>`:
+                    canDel?`<button class="post-del" onclick="deletePost('${p.id}')">×</button>`:'';
+    return `<div class="post-card"><div class="post-meta"><span class="post-author ${p.isAdmin?'adm':''}">${esc(p.author||'익명')}</span><span class="post-time">${p.createdAt?timeAgo(p.createdAt):''}</span>${adminBtns}</div><div class="post-content">${esc(p.content||'')}</div><div class="comments-section">${commHtml}<div class="comment-form"><input type="text" id="comment-input-${p.id}" placeholder="댓글 달기..." onkeydown="if(event.key==='Enter')submitComment('${p.id}')"><button class="btn sm primary" onclick="submitComment('${p.id}')">등록</button></div></div></div>`;
   }).join('');
 }
+
+// ── CALENDAR ──
+let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), calMemos={}, calSelectedDate='';
+
+// 요일 헤더 렌더링
+const weekdays=document.getElementById('cal-weekdays');
+['일','월','화','수','목','금','토'].forEach((d,i)=>{
+  const el=document.createElement('div');
+  el.textContent=d;
+  el.style.cssText=`text-align:center;font-size:11px;font-weight:700;padding:4px 0;color:${i===0?'var(--red)':i===6?'var(--b500)':'var(--g400)'}`;
+  weekdays.appendChild(el);
+});
+
+async function loadCalMemos() {
+  const data=await fsGet('data/calendar',{memos:{}});
+  calMemos=data.memos||{};
+}
+async function saveCalMemos() { await fsSet('data/calendar',{memos:calMemos}); }
+
+function renderCalendar() {
+  const title=document.getElementById('cal-title');
+  title.textContent=`${calYear}년 ${calMonth+1}월`;
+  const grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  const first=new Date(calYear,calMonth,1).getDay();
+  const days=new Date(calYear,calMonth+1,0).getDate();
+  const today=new Date();
+  const prevDays=new Date(calYear,calMonth,0).getDate();
+  // 이전달
+  for(let i=first-1;i>=0;i--) {
+    const el=document.createElement('div');
+    el.className='cal-day other-month';
+    el.innerHTML=`<div class="cal-day-num" style="color:var(--g300)">${prevDays-i}</div>`;
+    grid.appendChild(el);
+  }
+  // 이번달
+  for(let d=1;d<=days;d++) {
+    const dateKey=`${calYear}-${pad(calMonth+1)}-${pad(d)}`;
+    const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth&&today.getDate()===d;
+    const dow=(first+d-1)%7;
+    const el=document.createElement('div');
+    el.className='cal-day'+(isToday?' today':'')+(calMemos[dateKey]?' has-memo':'');
+    el.innerHTML=`<div class="cal-day-num" style="color:${dow===0?'var(--red)':dow===6?'var(--b500)':'var(--g800)'}">${d}</div>`;
+    el.onclick=()=>openCalModal(dateKey,d);
+    grid.appendChild(el);
+  }
+  // 다음달
+  const total=first+days;
+  const remaining=(7-total%7)%7;
+  for(let i=1;i<=remaining;i++) {
+    const el=document.createElement('div');
+    el.className='cal-day other-month';
+    el.innerHTML=`<div class="cal-day-num" style="color:var(--g300)">${i}</div>`;
+    grid.appendChild(el);
+  }
+}
+
+function openCalModal(dateKey,d) {
+  calSelectedDate=dateKey;
+  document.getElementById('cal-modal-date').textContent=`${calYear}년 ${calMonth+1}월 ${d}일`;
+  document.getElementById('cal-memo-input').value=calMemos[dateKey]||'';
+  document.getElementById('cal-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('cal-memo-input').focus(),100);
+}
+window.closeCalModal = () => { document.getElementById('cal-modal').style.display='none'; };
+window.saveCalMemo = async () => {
+  const text=document.getElementById('cal-memo-input').value.trim();
+  if(text) calMemos[calSelectedDate]=text; else delete calMemos[calSelectedDate];
+  await saveCalMemos(); renderCalendar(); closeCalModal(); notify('저장 완료!');
+};
+window.delCalMemo = async () => {
+  delete calMemos[calSelectedDate];
+  await saveCalMemos(); renderCalendar(); closeCalModal(); notify('삭제 완료!');
+};
+window.calMove = async (dir) => {
+  calMonth+=dir;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  renderCalendar();
+};
+document.getElementById('cal-modal').addEventListener('click',e=>{ if(e.target===document.getElementById('cal-modal')) closeCalModal(); });
+
+
 </script>
 </body>
 </html>
