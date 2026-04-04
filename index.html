@@ -837,6 +837,7 @@ window.swToggle = () => {
   else { clearInterval(swInterval); }
 };
 function swTick() {
+  if(!swStart) return;
   swElapsed=Date.now()-swStart;
   const h=Math.floor(swElapsed/3600000),m=Math.floor((swElapsed%3600000)/60000),s=Math.floor((swElapsed%60000)/1000);
   document.getElementById('sw-display').textContent=pad(h)+':'+pad(m)+':'+pad(s);
@@ -867,7 +868,11 @@ async function swLoadToday() {
     const data = await fsGet('data/sw', {});
     if(data.date === getKSTDateKey() && data.elapsed > 0) {
       swElapsed = data.elapsed;
-      swTick();
+      swStart = Date.now() - swElapsed;
+      const h=Math.floor(swElapsed/3600000),m=Math.floor((swElapsed%3600000)/60000),s=Math.floor((swElapsed%60000)/1000);
+      document.getElementById('sw-display').textContent=pad(h)+':'+pad(m)+':'+pad(s);
+      const totalMin=Math.floor(swElapsed/60000);
+      document.getElementById('stat-sw').textContent=pad(Math.floor(totalMin/60))+':'+pad(totalMin%60);
     } else {
       swReset();
     }
