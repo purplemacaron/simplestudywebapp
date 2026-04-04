@@ -640,7 +640,6 @@ onAuthStateChanged(auth, async user => {
     return;
   }
   currentUser = user;
-  document.body.innerHTML += `<p>UID: ${user.uid}</p>`;
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('main-nav').style.display    = 'flex';
   document.querySelectorAll('.page').forEach(p => p.style.display='');
