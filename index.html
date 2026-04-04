@@ -527,6 +527,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
 <audio id="alarm-audio" preload="auto"></audio>
 
 <script type="module">
+localStorage.removeItem('ss_sw');
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, signInAnonymously, signOut as fbSignOut, onAuthStateChanged,
   GoogleAuthProvider, signInWithPopup,
@@ -867,8 +868,10 @@ async function swLoadToday() {
     if(data.date === getKSTDateKey() && data.elapsed > 0) {
       swElapsed = data.elapsed;
       swTick();
+    } else {
+      swReset();
     }
-  } catch(e) {}
+  } catch(e) { swReset(); }
 }
 window.swSave = async () => {
   if(!currentUser) return;
