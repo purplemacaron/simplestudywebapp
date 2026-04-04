@@ -227,14 +227,14 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
       <button class="google-btn" onclick="doEmailAuth(false)" style="flex:1;padding:11px">로그인</button>
       <button class="google-btn" onclick="doEmailAuth(true)" style="flex:1;padding:11px;border-color:var(--b300);color:var(--b600)">회원가입</button>
     </div>
-    <button class="google-btn" onclick="doAnonymous()" style="border-color:var(--g200);color:var(--g500)">👤 익명으로 시작</button>
+    <button class="google-btn" onclick="doAnonymous()" style="border-color:var(--g200);color:var(--g500)">익명으로 시작</button>
     <p class="auth-note">Google 또는 이메일로 로그인 시 데이터가 계정에 저장됩니다</p>
   </div>
 </div>
 
 <div id="banned-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#fee2e2,var(--white));align-items:center;justify-content:center;z-index:1000;padding:20px">
   <div class="auth-box" style="border-color:#fecaca">
-    <div style="font-size:40px;margin-bottom:16px">🚫</div>
+    <div style="font-size:40px;margin-bottom:16px">X</div>
     <div class="auth-logo" style="color:var(--red)">이용 정지</div>
     <div class="auth-desc">운영자에 의해 이용이 정지되었습니다.<br>문의사항은 커뮤니티를 통해 연락해주세요.</div>
     <button class="google-btn" onclick="doSignOut()" style="border-color:#fecaca">로그아웃</button>
@@ -266,8 +266,9 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
 <!-- 달력 메모 모달 -->
 <div class="modal-overlay" id="cal-modal">
   <div class="modal-box">
-    <div style="font-size:15px;font-weight:700;margin-bottom:16px" id="cal-modal-date"></div>
-    <textarea id="cal-memo-input" placeholder="이 날의 메모를 입력하세요..." style="width:100%;min-height:120px;margin-bottom:12px;font-size:14px"></textarea>
+    <div style="font-size:15px;font-weight:700;margin-bottom:12px" id="cal-modal-date"></div>
+    <div id="cal-modal-stats" style="display:none;background:var(--b50);border:1px solid var(--b100);border-radius:var(--rs);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--b700);line-height:1.8"></div>
+    <textarea id="cal-memo-input" placeholder="이 날의 메모를 입력하세요..." style="width:100%;min-height:100px;margin-bottom:12px;font-size:14px"></textarea>
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn" onclick="closeCalModal()">취소</button>
       <button class="btn danger" onclick="delCalMemo()">삭제</button>
@@ -361,7 +362,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
           <button class="btn" onclick="swLap()">랩</button>
           <button class="btn primary" id="sw-btn" onclick="swToggle()">시작</button>
           <button class="btn" onclick="swReset()">초기화</button>
-          <button class="btn" onclick="swSave()">💾 저장</button>
+          <button class="btn" onclick="swSave()">저장</button>
         </div>
       </div>
     </div>
@@ -762,20 +763,13 @@ window.resetCycleStats = () => { pomoCycleTotal=0; pomoFocusDone=0; renderCycleD
 async function savePomodoroStat(total) {
   if(!currentUser) return;
   await fsSet('stats/pomodoro',{total,updatedAt:new Date().toISOString()});
-  // 달력에 포모도로 기록
-  const today=new Date(); const dateKey=`${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
-  const data=await fsGet('data/calendar',{memos:{}});
-  const memos=data.memos||{};
-  const existing=memos[dateKey]||'';
-  const pomoText=`🍅 포모도로 ${total}회`;
-  // 이미 포모도로 기록이 있으면 업데이트, 없으면 추가
-  if(existing.includes('🍅')) {
-    memos[dateKey]=existing.replace(/🍅 포모도로 \d+회/,pomoText);
-  } else {
-    memos[dateKey]=existing?existing+'\n'+pomoText:pomoText;
-  }
-  await fsSet('data/calendar',{memos});
-  calMemos=memos; renderCalendar();
+  const todayKey = getKSTDateKey();
+  const pomoText = `포모도로 ${total}회`;
+  const statsData = await fsGet('data/calStats', {});
+  const stats = statsData.stats || {};
+  stats[todayKey] = {...(stats[todayKey]||{}), pomo: pomoText};
+  await fsSet('data/calStats', {stats});
+  calStats = stats; renderCalendar();
 }
 ['pomo-focus-min','pomo-short-min','pomo-long-min','pomo-cycle-count'].forEach(id=>{
   document.getElementById(id).addEventListener('input',()=>{ if(!pomoRunning) pomoInit(); });
@@ -864,22 +858,13 @@ window.swReset = () => {
   document.getElementById('sw-laps').innerHTML='';
 };
 function getKSTDateKey() {
-  const now = new Date();
-  const kst = new Date(now.getTime() + 9*60*60*1000);
-  return kst.toISOString().slice(0,10);
-}
-function getMsUntilMidnightKST() {
-  const now = new Date();
-  const kst = new Date(now.getTime() + 9*60*60*1000);
-  const msLeft = (24*60*60*1000) - (kst % (24*60*60*1000));
-  return msLeft;
+  return new Date(Date.now()+9*3600000).toISOString().slice(0,10);
 }
 async function swLoadToday() {
   if(!currentUser) return;
   try {
     const data = await fsGet('data/sw', {});
-    const todayKey = getKSTDateKey();
-    if(data.date === todayKey && data.elapsed > 0) {
+    if(data.date === getKSTDateKey() && data.elapsed > 0) {
       swElapsed = data.elapsed;
       swTick();
     }
@@ -887,32 +872,23 @@ async function swLoadToday() {
 }
 window.swSave = async () => {
   if(!currentUser) return;
-  const totalMin=Math.floor(swElapsed/60000);
-  if(!totalMin) { notify('기록할 시간이 없습니다'); return; }
+  if(!swElapsed) { notify('기록할 시간이 없습니다'); return; }
   const todayKey = getKSTDateKey();
-  // Firestore에 순공 시간 저장
   await fsSet('data/sw', {date: todayKey, elapsed: swElapsed});
-  // 달력에도 기록
-  const data=await fsGet('data/calendar',{memos:{}});
-  const memos=data.memos||{};
-  const existing=memos[todayKey]||'';
-  const swText=`⏱ 순공 ${pad(Math.floor(totalMin/60))}:${pad(totalMin%60)}`;
-  if(existing.includes('⏱')) {
-    memos[todayKey]=existing.replace(/⏱ 순공 \d+:\d+/, swText);
-  } else {
-    memos[todayKey]=existing?existing+'\n'+swText:swText;
-  }
-  await fsSet('data/calendar',{memos});
-  calMemos=memos; renderCalendar();
+  // 달력 stats에 순공 기록
+  const totalMin = Math.floor(swElapsed/60000);
+  const swText = `순공 ${pad(Math.floor(totalMin/60))}:${pad(totalMin%60)}`;
+  const statsData = await fsGet('data/calStats', {});
+  const stats = statsData.stats || {};
+  stats[todayKey] = {...(stats[todayKey]||{}), sw: swText};
+  await fsSet('data/calStats', {stats});
+  calStats = stats; renderCalendar();
   notify('순공 시간이 저장되었습니다!');
 };
-// 자정(KST) 자동 초기화
 function scheduleSwMidnightReset() {
-  setTimeout(()=>{
-    swReset();
-    notify('자정이 지나 순공 시간이 초기화되었습니다');
-    scheduleSwMidnightReset();
-  }, getMsUntilMidnightKST());
+  const now = new Date(Date.now()+9*3600000);
+  const msLeft = (24*3600000) - (now % (24*3600000));
+  setTimeout(()=>{ swReset(); notify('자정이 지나 순공 시간이 초기화되었습니다'); scheduleSwMidnightReset(); }, msLeft);
 }
 scheduleSwMidnightReset();
 
@@ -1123,18 +1099,18 @@ function renderPosts(posts) {
       const cDel=isAdmin||(c.uid===myUid);
       const cBan=isAdmin&&c.uid&&!c.isAdmin;
       const cTime=c.createdAt?timeAgo(typeof c.createdAt==='string'?{toDate:()=>new Date(c.createdAt)}:c.createdAt):'';
-      const cAdminBtns=cBan?`<button class="comment-del" style="color:var(--red)" onclick="deleteComment('${p.id}','${esc(c.id)}');banUserDirect('${esc(c.uid)}')">🚫</button>`:'';
+      const cAdminBtns=cBan?`<button class="comment-del" style="color:var(--red)" onclick="deleteComment('${p.id}','${esc(c.id)}');banUserDirect('${esc(c.uid)}')">차단</button>`:'';
       const cDelBtn=cDel&&!cBan?`<button class="comment-del" onclick="deleteComment('${p.id}','${esc(c.id)}')">×</button>`:'';
       return `<div class="comment-item"><div class="comment-meta"><span class="comment-author ${c.isAdmin?'adm':''}">${esc(c.author||'익명')}</span><span class="comment-time">${cTime}</span>${cAdminBtns}${cDelBtn}</div><div class="comment-content">${esc(c.text||'')}</div></div>`;
     }).join('');
-    const adminBtns=canBan?`<button class="post-del" style="color:var(--red)" onclick="deletePost('${p.id}');banUserDirect('${esc(p.uid)}')">🚫</button>`:
+    const adminBtns=canBan?`<button class="post-del" style="color:var(--red)" onclick="deletePost('${p.id}');banUserDirect('${esc(p.uid)}')">차단</button>`:
                     canDel?`<button class="post-del" onclick="deletePost('${p.id}')">×</button>`:'';
     return `<div class="post-card"><div class="post-meta"><span class="post-author ${p.isAdmin?'adm':''}">${esc(p.author||'익명')}</span><span class="post-time">${p.createdAt?timeAgo(p.createdAt):''}</span>${adminBtns}</div><div class="post-content">${esc(p.content||'')}</div><div class="comments-section">${commHtml}<div class="comment-form"><input type="text" id="comment-input-${p.id}" placeholder="댓글 달기..." onkeydown="if(event.key==='Enter')submitComment('${p.id}')"><button class="btn sm primary" onclick="submitComment('${p.id}')">등록</button></div></div></div>`;
   }).join('');
 }
 
 // ── CALENDAR ──
-let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), calMemos={}, calSelectedDate='';
+let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), calMemos={}, calStats={}, calSelectedDate='';
 
 // 요일 헤더 렌더링
 const weekdays=document.getElementById('cal-weekdays');
@@ -1148,6 +1124,8 @@ const weekdays=document.getElementById('cal-weekdays');
 async function loadCalMemos() {
   const data=await fsGet('data/calendar',{memos:{}});
   calMemos=data.memos||{};
+  const statsData=await fsGet('data/calStats',{});
+  calStats=statsData.stats||{};
 }
 async function saveCalMemos() { await fsSet('data/calendar',{memos:calMemos}); }
 
@@ -1173,7 +1151,7 @@ function renderCalendar() {
     const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth&&today.getDate()===d;
     const dow=(first+d-1)%7;
     const el=document.createElement('div');
-    el.className='cal-day'+(isToday?' today':'')+(calMemos[dateKey]?' has-memo':'');
+    el.className='cal-day'+(isToday?' today':'')+((calMemos[dateKey]||calStats[dateKey])?' has-memo':'');
     el.innerHTML=`<div class="cal-day-num" style="color:${dow===0?'var(--red)':dow===6?'var(--b500)':'var(--g800)'}">${d}</div>`;
     el.onclick=()=>openCalModal(dateKey,d);
     grid.appendChild(el);
@@ -1193,6 +1171,15 @@ function openCalModal(dateKey,d) {
   calSelectedDate=dateKey;
   document.getElementById('cal-modal-date').textContent=`${calYear}년 ${calMonth+1}월 ${d}일`;
   document.getElementById('cal-memo-input').value=calMemos[dateKey]||'';
+  const s=calStats[dateKey];
+  const statsEl=document.getElementById('cal-modal-stats');
+  if(s) {
+    const lines=[];
+    if(s.pomo) lines.push(s.pomo);
+    if(s.sw) lines.push(s.sw);
+    statsEl.innerHTML=lines.join('&nbsp;&nbsp;·&nbsp;&nbsp;');
+    statsEl.style.display='block';
+  } else { statsEl.style.display='none'; }
   document.getElementById('cal-modal').style.display='flex';
   setTimeout(()=>document.getElementById('cal-memo-input').focus(),100);
 }
