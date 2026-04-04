@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>심플스터디</title>
+<title>SimpleStudy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/fabric@5.3.0/dist/fabric.min.js"></script>
@@ -228,7 +228,24 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
       <button class="google-btn" onclick="doEmailAuth(true)" style="flex:1;padding:11px;border-color:var(--b300);color:var(--b600)">회원가입</button>
     </div>
     <button class="google-btn" onclick="doAnonymous()" style="border-color:var(--g200);color:var(--g500)">익명으로 시작</button>
+    <div style="display:flex;align-items:center;gap:6px;margin-top:14px;justify-content:center">
+      <input type="checkbox" id="privacy-agree" style="width:14px;height:14px;cursor:pointer">
+      <label for="privacy-agree" style="font-size:11px;color:var(--g500);cursor:pointer">
+        <span onclick="document.getElementById('privacy-modal').style.display='flex'" style="color:var(--b600);text-decoration:underline;cursor:pointer">개인정보처리방침</span>에 동의합니다 (회원가입 필수)
+      </label>
+    </div>
     <p class="auth-note">Google 또는 이메일로 로그인 시 데이터가 계정에 저장됩니다</p>
+  </div>
+</div>
+
+<div id="verify-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,var(--b50),var(--white) 60%,var(--b100));align-items:center;justify-content:center;z-index:1000;padding:20px">
+  <div class="auth-box">
+    <div class="auth-logo">Simple<span>Study</span></div>
+    <div style="font-size:32px;margin-bottom:12px">✉</div>
+    <div style="font-size:15px;font-weight:700;margin-bottom:8px">이메일 인증이 필요합니다</div>
+    <div class="auth-desc">입력하신 이메일로 인증 메일을 발송했습니다.<br>메일함을 확인하고 인증 후 다시 로그인해 주세요.</div>
+    <button class="google-btn" onclick="backToLogin()" style="margin-bottom:10px">로그인 화면으로</button>
+    <button class="google-btn" onclick="resendVerification()" style="border-color:var(--g200);color:var(--g500);font-size:13px">인증 메일 재발송</button>
   </div>
 </div>
 
@@ -236,12 +253,40 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
   <div class="auth-box" style="border-color:#fecaca">
     <div style="font-size:40px;margin-bottom:16px">X</div>
     <div class="auth-logo" style="color:var(--red)">이용 정지</div>
-    <div class="auth-desc">운영자에 의해 이용이 정지되었습니다.<br>문의사항은 커뮤니티를 통해 연락해주세요.</div>
-    <button class="google-btn" onclick="doSignOut()" style="border-color:#fecaca">로그아웃</button>
+    <div class="auth-desc">운영자에 의해 이용이 정지되었습니다.</div>
+    <div id="ban-info" style="font-size:13px;color:var(--g600);background:var(--g50);border-radius:var(--rs);padding:12px 16px;margin-bottom:16px;text-align:left;display:none"></div>
+    <div class="auth-desc" style="font-size:12px">문의사항은 문의하기를 통해 연락해주세요.</div>
+    <button class="google-btn" onclick="doSignOut()" style="border-color:#fecaca;margin-top:12px">로그아웃</button>
   </div>
 </div>
 
 <div class="notif" id="notif"></div>
+
+<!-- 개인정보처리방침 모달 -->
+<div class="modal-overlay" id="privacy-modal" style="z-index:1100">
+  <div class="modal-box" style="max-width:520px;max-height:80vh;overflow-y:auto">
+    <div style="font-size:16px;font-weight:700;margin-bottom:16px">개인정보처리방침</div>
+    <div style="font-size:13px;color:var(--g600);line-height:1.8">
+      <p style="font-weight:600;margin-bottom:6px">1. 수집하는 개인정보 항목</p>
+      <p style="margin-bottom:12px">이메일 주소, Google 계정 정보(Google 로그인 시), 익명 식별자(익명 로그인 시)</p>
+      <p style="font-weight:600;margin-bottom:6px">2. 개인정보의 수집 및 이용 목적</p>
+      <p style="margin-bottom:12px">서비스 제공 및 회원 관리, 학습 데이터(할일, 단어장, 달력 메모 등) 저장 및 동기화</p>
+      <p style="font-weight:600;margin-bottom:6px">3. 개인정보의 보유 및 이용 기간</p>
+      <p style="margin-bottom:12px">회원 탈퇴 시까지. 단, 관계 법령에 의해 보존이 필요한 경우 해당 기간 동안 보관합니다.</p>
+      <p style="font-weight:600;margin-bottom:6px">4. 개인정보의 제3자 제공</p>
+      <p style="margin-bottom:12px">이용자의 개인정보를 제3자에게 제공하지 않습니다. 단, 서비스 운영을 위해 Firebase(Google LLC)를 활용하며, Firebase의 개인정보처리방침이 적용됩니다.</p>
+      <p style="font-weight:600;margin-bottom:6px">5. 커뮤니티 이용</p>
+      <p style="margin-bottom:12px">커뮤니티에 작성한 게시글 및 댓글은 다른 이용자에게 공개됩니다. 운영 정책 위반 시 게시물 삭제 및 서비스 이용이 제한될 수 있습니다.</p>
+      <p style="font-weight:600;margin-bottom:6px">6. 이용자의 권리</p>
+      <p style="margin-bottom:12px">이용자는 언제든지 본인의 개인정보를 조회하거나 삭제를 요청할 수 있습니다. 계정 삭제 시 모든 데이터가 삭제됩니다.</p>
+      <p style="font-weight:600;margin-bottom:6px">7. 문의</p>
+      <p>개인정보 관련 문의는 서비스 내 문의하기를 이용해 주세요.</p>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:20px">
+      <button class="btn primary" onclick="document.getElementById('privacy-modal').style.display='none'">확인</button>
+    </div>
+  </div>
+</div>
 
 <div class="quiz-overlay" id="quiz-overlay">
   <div class="quiz-modal">
@@ -259,6 +304,27 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
     <div class="btn-group">
       <button class="btn" id="quiz-next-btn" onclick="nextQuiz()" style="display:none">다음</button>
       <button class="btn ghost" onclick="stopQuiz()">종료</button>
+    </div>
+  </div>
+</div>
+
+<!-- 차단 모달 -->
+<div class="modal-overlay" id="ban-modal">
+  <div class="modal-box">
+    <div style="font-size:15px;font-weight:700;margin-bottom:16px">사용자 차단</div>
+    <div style="font-size:12px;color:var(--g500);margin-bottom:8px">차단 기간</div>
+    <select id="ban-duration" style="width:100%;margin-bottom:12px;font-size:13px">
+      <option value="1">1일</option>
+      <option value="3">3일</option>
+      <option value="7">7일</option>
+      <option value="30">30일</option>
+      <option value="0">영구</option>
+    </select>
+    <div style="font-size:12px;color:var(--g500);margin-bottom:8px">차단 사유</div>
+    <textarea id="ban-reason" placeholder="차단 사유를 입력하세요..." style="width:100%;min-height:80px;margin-bottom:14px;font-size:13px"></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="document.getElementById('ban-modal').style.display='none'">취소</button>
+      <button class="btn danger" onclick="confirmBan()">차단</button>
     </div>
   </div>
 </div>
@@ -284,6 +350,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
   <button class="nav-btn" onclick="goto('todo',this)">할일</button>
   <button class="nav-btn" onclick="goto('vocab',this)">단어장</button>
   <button class="nav-btn" onclick="goto('community',this)">커뮤니티</button>
+  <button class="nav-btn" onclick="goto('inquiry',this)">문의하기</button>
   <button class="nav-btn" onclick="goto('calendar',this)">달력</button>
   <button class="nav-btn" id="admin-nav-btn" onclick="goto('admin',this)" style="display:none">차단관리</button>
   <div class="nav-spacer"></div>
@@ -356,12 +423,20 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12"/></svg>
           스톱워치 (순공)
         </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <label style="font-size:12px;color:var(--g500);display:flex;align-items:center;gap:5px">
+            목표
+            <input type="number" id="sw-goal-h" min="0" max="23" value="0" style="width:46px;text-align:center;padding:6px 8px;font-size:12px"> 시간
+            <input type="number" id="sw-goal-m" min="0" max="59" value="0" style="width:46px;text-align:center;padding:6px 8px;font-size:12px"> 분
+          </label>
+        </div>
         <div class="timer-display" id="sw-display" style="font-size:40px">00:00:00</div>
+        <div id="sw-goal-bar" style="height:6px;background:var(--g100);border-radius:99px;margin:8px 0 12px;overflow:hidden;display:none"><div id="sw-goal-fill" style="height:100%;background:linear-gradient(90deg,var(--b400),var(--b600));border-radius:99px;transition:width .4s;width:0%"></div></div>
+        <div id="sw-goal-label" style="font-size:11px;color:var(--b500);text-align:center;margin-bottom:8px;display:none"></div>
         <div id="sw-laps" style="max-height:80px;overflow-y:auto;margin-bottom:12px;font-size:12px;color:var(--g400)"></div>
         <div class="btn-group">
           <button class="btn" onclick="swLap()">랩</button>
           <button class="btn primary" id="sw-btn" onclick="swToggle()">시작</button>
-          <button class="btn" onclick="swReset()">초기화</button>
           <button class="btn" onclick="swSave()">저장</button>
         </div>
       </div>
@@ -459,9 +534,15 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       단어장
     </div>
+    <!-- 덱 목록 -->
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+      <div id="deck-tabs" style="display:flex;gap:6px;flex-wrap:wrap;flex:1"></div>
+      <button class="btn sm primary" onclick="createDeck()">+ 새 묶음</button>
+    </div>
+    <!-- 단어 추가 폼 -->
     <div class="vocab-form">
       <input type="text" id="vocab-word" placeholder="단어" onkeydown="if(event.key==='Enter')document.getElementById('vocab-mean').focus()">
-      <input type="text" id="vocab-mean" placeholder="뜻" onkeydown="if(event.key==='Enter')addVocab()">
+      <input type="text" id="vocab-mean" placeholder="뜻 (쉼표로 복수정답)" onkeydown="if(event.key==='Enter')addVocab()">
       <button class="btn primary" onclick="addVocab()">추가</button>
     </div>
     <div class="vocab-toolbar">
@@ -491,6 +572,27 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
     <div class="empty-state">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       <p>아직 게시물이 없습니다</p>
+    </div>
+  </div>
+</div>
+
+<!-- INQUIRY -->
+<div class="page" id="page-inquiry">
+  <div class="community-header">
+    <h2>문의하기</h2>
+    <span id="inq-status" style="font-size:12px;color:var(--g400)"></span>
+  </div>
+  <div class="post-form-card">
+    <textarea id="inq-content" placeholder="운영자에게 문의할 내용을 남겨주세요..."></textarea>
+    <div class="post-form-footer">
+      <span style="font-size:12px;color:var(--g400)" id="inq-author-label"></span>
+      <button class="btn primary" onclick="submitInquiry()">문의 등록</button>
+    </div>
+  </div>
+  <div id="inquiry-container">
+    <div class="empty-state">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <p>아직 문의가 없습니다</p>
     </div>
   </div>
 </div>
@@ -531,7 +633,7 @@ localStorage.removeItem('ss_sw');
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, signInAnonymously, signOut as fbSignOut, onAuthStateChanged,
   GoogleAuthProvider, signInWithPopup,
-  createUserWithEmailAndPassword, signInWithEmailAndPassword }
+  createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, doc, addDoc, getDocs, deleteDoc, updateDoc,
   onSnapshot, query, orderBy, serverTimestamp, getDoc, setDoc, arrayUnion, limit }
@@ -566,6 +668,7 @@ window.goto = (page, btn) => {
   document.getElementById('page-'+page).classList.add('active');
   if (btn) btn.classList.add('active');
   if (page==='community') initCommunity();
+  if (page==='inquiry') initInquiry();
   if (page==='calendar') renderCalendar();
   if (page==='admin') renderBannedList();
 };
@@ -581,22 +684,53 @@ const fsColUpd = async (col, id, data) => updateDoc(doc(db, `users/${currentUser
 
 // ── AUTH ──
 window.doAnonymous = async () => { try { await signInAnonymously(auth); } catch(e) { notify('오류: '+e.message); } };
-window.doGoogle = async () => { try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e) { notify('오류: '+e.message); } };
+window.doGoogle = async () => {
+  if(!document.getElementById('privacy-agree').checked) { notify('개인정보처리방침에 동의해주세요'); return; }
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e) { notify('오류: '+e.message); }
+};
 window.doEmailAuth = async (isSignUp) => {
   const email = document.getElementById('auth-email').value.trim();
   const pw = document.getElementById('auth-pw').value;
   if (!email || !pw) { notify('이메일과 비밀번호를 입력하세요'); return; }
+  if (isSignUp && !document.getElementById('privacy-agree').checked) { notify('개인정보처리방침에 동의해주세요'); return; }
   try {
-    if (isSignUp) await createUserWithEmailAndPassword(auth, email, pw);
-    else await signInWithEmailAndPassword(auth, email, pw);
+    if (isSignUp) {
+      const cred = await createUserWithEmailAndPassword(auth, email, pw);
+      await sendEmailVerification(cred.user);
+      await fbSignOut(auth);
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('verify-screen').style.display = 'flex';
+    } else {
+      const cred = await signInWithEmailAndPassword(auth, email, pw);
+      if (!cred.user.emailVerified) {
+        await fbSignOut(auth);
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('verify-screen').style.display = 'flex';
+      }
+    }
   } catch(e) {
     const msg = e.code === 'auth/email-already-in-use' ? '이미 사용 중인 이메일입니다' :
                 e.code === 'auth/wrong-password' ? '비밀번호가 틀렸습니다' :
                 e.code === 'auth/user-not-found' ? '존재하지 않는 계정입니다' :
                 e.code === 'auth/weak-password' ? '비밀번호는 6자 이상이어야 합니다' :
-                e.code === 'auth/invalid-email' ? '이메일 형식이 올바르지 않습니다' : e.message;
+                e.code === 'auth/invalid-email' ? '이메일 형식이 올바르지 않습니다' :
+                e.code === 'auth/invalid-credential' ? '이메일 또는 비밀번호가 올바르지 않습니다' : e.message;
     notify(msg);
   }
+};
+window.resendVerification = async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const pw = document.getElementById('auth-pw').value;
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email, pw);
+    await sendEmailVerification(cred.user);
+    await fbSignOut(auth);
+    notify('인증 메일을 재발송했습니다');
+  } catch(e) { notify('재발송 실패: '+e.message); }
+};
+window.backToLogin = () => {
+  document.getElementById('verify-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
 };
 window.doSignOut = async () => {
   if (!confirm('로그아웃하시겠습니까?')) return;
@@ -620,10 +754,22 @@ onAuthStateChanged(auth, async user => {
   try {
     const banSnap = await getDoc(doc(db,'banned',user.uid));
     if (banSnap.exists()) {
-      document.getElementById('banned-screen').style.display = 'flex';
-      document.getElementById('main-nav').style.display = 'none';
-      document.querySelectorAll('.page').forEach(p => p.style.display='none');
-      return;
+      const banData = banSnap.data();
+      // 기간 만료 확인
+      if(banData.expiresAt && new Date(banData.expiresAt) < new Date()) {
+        await deleteDoc(doc(db,'banned',user.uid));
+      } else {
+        const infoEl = document.getElementById('ban-info');
+        const lines = [];
+        if(banData.reason) lines.push(`사유: ${banData.reason}`);
+        if(banData.expiresAt) lines.push(`해제일: ${new Date(banData.expiresAt).toLocaleDateString('ko-KR')}`);
+        else if(banData.days===0) lines.push('기간: 영구');
+        if(lines.length) { infoEl.innerHTML=lines.join('<br>'); infoEl.style.display='block'; }
+        document.getElementById('banned-screen').style.display = 'flex';
+        document.getElementById('main-nav').style.display = 'none';
+        document.querySelectorAll('.page').forEach(p => p.style.display='none');
+        return;
+      }
     }
   } catch(e) {}
 
@@ -657,18 +803,34 @@ async function loadAllData() {
 }
 
 // ── ADMIN ──
-window.banUserDirect = async uid => {
+let banTargetUid=null, banTargetPostId=null, banTargetCommentId=null;
+window.banUserDirect = (uid, postId=null, commentId=null) => {
   if (!isAdmin || !uid) return;
+  banTargetUid=uid; banTargetPostId=postId; banTargetCommentId=commentId;
+  document.getElementById('ban-reason').value='';
+  document.getElementById('ban-duration').value='7';
+  document.getElementById('ban-modal').style.display='flex';
+};
+window.confirmBan = async () => {
+  if(!banTargetUid) return;
+  const reason = document.getElementById('ban-reason').value.trim();
+  const days = parseInt(document.getElementById('ban-duration').value);
+  const bannedAt = new Date().toISOString();
+  const expiresAt = days===0 ? null : new Date(Date.now()+days*86400000).toISOString();
   try {
-    await setDoc(doc(db,'banned',uid), {bannedAt: new Date().toISOString()});
+    await setDoc(doc(db,'banned',banTargetUid), {bannedAt, reason:reason||'사유 없음', expiresAt, days});
+    if(banTargetCommentId) await deleteComment(banTargetPostId, banTargetCommentId);
+    else if(banTargetPostId) await deletePost(banTargetPostId);
     notify('차단 완료');
+    document.getElementById('ban-modal').style.display='none';
+    banTargetUid=null; banTargetPostId=null; banTargetCommentId=null;
     renderBannedList();
   } catch(e) { notify('오류: '+e.message); }
 };
 window.unbanUserById = async uid => {
   try {
     await deleteDoc(doc(db,'banned',uid));
-    notify('정지 해제: '+uid);
+    notify('차단 해제 완료');
     renderBannedList();
   } catch(e) { notify('오류: '+e.message); }
 };
@@ -678,15 +840,18 @@ async function renderBannedList() {
     const snap = await getDocs(collection(db,'banned'));
     const el = document.getElementById('banned-list');
     if (snap.empty) { el.innerHTML='<div style="font-size:13px;color:var(--g400)">차단된 사용자 없음</div>'; return; }
-    el.innerHTML = snap.docs.map(d=>`
-      <div class="user-item">
+    el.innerHTML = snap.docs.map(d=>{
+      const data=d.data();
+      const exp=data.expiresAt?`~ ${new Date(data.expiresAt).toLocaleDateString('ko-KR')} (${data.days}일)`:'영구';
+      return `<div class="user-item">
         <div>
-          <div style="font-size:12px;font-weight:600;color:var(--g700)">익명 사용자</div>
           <div class="user-uid">${esc(d.id)}</div>
-          <div style="font-size:11px;color:var(--g400);margin-top:2px">${d.data().bannedAt?new Date(d.data().bannedAt).toLocaleString('ko-KR'):''} 차단</div>
+          <div style="font-size:11px;color:var(--g600);margin-top:2px">사유: ${esc(data.reason||'-')}</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:1px">기간: ${exp}</div>
         </div>
-        <button class="btn xs primary" onclick="unbanUserById('${esc(d.id)}')">차단 해제</button>
-      </div>`).join('');
+        <button class="btn xs primary" onclick="unbanUserById('${esc(d.id)}')">해제</button>
+      </div>`;
+    }).join('');
   } catch(e) { notify('목록 로드 실패'); }
 }
 
@@ -843,6 +1008,22 @@ function swTick() {
   document.getElementById('sw-display').textContent=pad(h)+':'+pad(m)+':'+pad(s);
   const totalMin=Math.floor(swElapsed/60000);
   document.getElementById('stat-sw').textContent=pad(Math.floor(totalMin/60))+':'+pad(totalMin%60);
+  // 목표 진행바
+  const goalH=parseInt(document.getElementById('sw-goal-h').value)||0;
+  const goalM=parseInt(document.getElementById('sw-goal-m').value)||0;
+  const goalMs=(goalH*60+goalM)*60000;
+  const bar=document.getElementById('sw-goal-bar');
+  const fill=document.getElementById('sw-goal-fill');
+  const label=document.getElementById('sw-goal-label');
+  if(goalMs>0) {
+    bar.style.display='block'; label.style.display='block';
+    const pct=Math.min(100,Math.round(swElapsed/goalMs*100));
+    fill.style.width=pct+'%';
+    label.textContent=pct>=100?'목표 달성!':pct+'% (목표 '+goalH+'시간 '+goalM+'분)';
+    fill.style.background=pct>=100?'linear-gradient(90deg,var(--green),#16a34a)':'linear-gradient(90deg,var(--b400),var(--b600))';
+  } else {
+    bar.style.display='none'; label.style.display='none';
+  }
 }
 window.swLap = () => {
   if(!swRunning) return;
@@ -963,8 +1144,26 @@ window.addTodo = async () => {
   todos.unshift({id:ref.id,text:v,done:false}); renderTodos();
   document.getElementById('todo-input').value='';
 };
-window.toggleTodo = async id => { const t=todos.find(x=>x.id===id); if(!t) return; t.done=!t.done; await fsColUpd('todos',id,{done:t.done}); renderTodos(); };
-window.deleteTodo = async id => { todos=todos.filter(t=>t.id!==id); await fsColDel('todos',id); renderTodos(); };
+window.toggleTodo = async id => {
+  const t=todos.find(x=>x.id===id); if(!t) return;
+  t.done=!t.done;
+  await fsColUpd('todos',id,{done:t.done});
+  renderTodos();
+  if(t.done) await saveTodoToCalendar();
+};
+window.deleteTodo = async id => { todos=todos.filter(t=>t.id!==id); await fsColDel('todos',id); renderTodos(); await saveTodoToCalendar(); };
+async function saveTodoToCalendar() {
+  if(!currentUser) return;
+  const todayKey = getKSTDateKey();
+  const doneTodos = todos.filter(t=>t.done);
+  const todoText = doneTodos.length ? '할일 '+doneTodos.length+'개 완료' : null;
+  const statsData = await fsGet('data/calStats', {});
+  const stats = statsData.stats || {};
+  if(todoText) stats[todayKey] = {...(stats[todayKey]||{}), todo: todoText};
+  else if(stats[todayKey]) delete stats[todayKey].todo;
+  await fsSet('data/calStats', {stats});
+  calStats = stats; renderCalendar();
+}
 
 // ── CANVAS ──
 let canvas=null, currentTool='pen', currentColor='#1e293b', brushSize=3, history=[];
@@ -1012,21 +1211,79 @@ ua.addEventListener('drop',e=>{ e.preventDefault(); ua.style.borderColor=''; con
 
 // ── VOCAB ──
 let vocabList=[], quizOrder=[], quizIdx=0, quizCorrect=0, quizWrong=0, quizAnswered=false, quizMode='word';
-async function loadVocab() { vocabList=await fsColGet('vocab'); vocabList.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); renderVocab(); }
+let decks=[], currentDeckId=null;
+
+async function loadVocab() {
+  // 덱 목록 로드
+  const deckData = await fsGet('data/decks', {list:[]});
+  decks = deckData.list || [];
+  if(!decks.length) {
+    decks = [{id:'default', name:'기본'}];
+    await fsSet('data/decks', {list:decks});
+  }
+  if(!currentDeckId) currentDeckId = decks[0].id;
+  await loadDeckVocab();
+  renderDeckTabs();
+}
+
+async function loadDeckVocab() {
+  vocabList = await fsColGet('vocab_'+currentDeckId);
+  vocabList.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  renderVocab();
+}
+
+function renderDeckTabs() {
+  document.getElementById('deck-tabs').innerHTML = decks.map(d=>`
+    <button class="btn sm ${d.id===currentDeckId?'primary':''}" onclick="switchDeck('${d.id}')">
+      ${esc(d.name)}
+      ${decks.length>1?`<span onclick="event.stopPropagation();deleteDeck('${d.id}')" style="margin-left:4px;opacity:.6;font-size:11px">×</span>`:''}
+    </button>`).join('');
+}
+
+window.switchDeck = async id => {
+  currentDeckId = id;
+  await loadDeckVocab();
+  renderDeckTabs();
+};
+
+window.createDeck = async () => {
+  const name = prompt('묶음 이름을 입력하세요');
+  if(!name||!name.trim()) return;
+  const id = 'deck_'+Date.now();
+  decks.push({id, name:name.trim()});
+  await fsSet('data/decks', {list:decks});
+  currentDeckId = id;
+  await loadDeckVocab();
+  renderDeckTabs();
+};
+
+window.deleteDeck = async id => {
+  if(decks.length<=1) { notify('마지막 묶음은 삭제할 수 없습니다'); return; }
+  if(!confirm('이 묶음과 단어를 모두 삭제할까요?')) return;
+  const words = await fsColGet('vocab_'+id);
+  await Promise.all(words.map(v=>fsColDel('vocab_'+id, v.id)));
+  decks = decks.filter(d=>d.id!==id);
+  await fsSet('data/decks', {list:decks});
+  if(currentDeckId===id) currentDeckId = decks[0].id;
+  await loadDeckVocab();
+  renderDeckTabs();
+};
+
 function renderVocab() {
   document.getElementById('vocab-count').textContent=`총 ${vocabList.length}개`;
   document.getElementById('vocab-list').innerHTML=vocabList.length
     ?vocabList.map(v=>`<div class="vocab-item"><div><div class="vocab-word">${esc(v.word)}</div><div class="vocab-mean">${esc(v.mean)}</div></div><div><button class="btn xs danger" onclick="deleteVocab('${v.id}')">삭제</button></div></div>`).join('')
     :'<div style="font-size:13px;color:var(--g400);padding:12px 0;text-align:center">단어를 추가하세요</div>';
 }
+
 window.addVocab = async () => {
   const w=document.getElementById('vocab-word').value.trim(), m=document.getElementById('vocab-mean').value.trim();
   if(!w||!m) { notify('단어와 뜻을 모두 입력하세요'); return; }
-  const ref=await fsColAdd('vocab',{word:w,mean:m});
+  const ref=await fsColAdd('vocab_'+currentDeckId,{word:w,mean:m});
   vocabList.unshift({id:ref.id,word:w,mean:m}); renderVocab();
   document.getElementById('vocab-word').value=''; document.getElementById('vocab-mean').value=''; document.getElementById('vocab-word').focus();
 };
-window.deleteVocab = async id => { vocabList=vocabList.filter(v=>v.id!==id); await fsColDel('vocab',id); renderVocab(); };
+window.deleteVocab = async id => { vocabList=vocabList.filter(v=>v.id!==id); await fsColDel('vocab_'+currentDeckId,id); renderVocab(); };
 window.shuffleVocab = () => { for(let i=vocabList.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[vocabList[i],vocabList[j]]=[vocabList[j],vocabList[i]];} renderVocab(); notify('섞었습니다'); };
 window.startQuiz = (mode='word') => {
   if(!vocabList.length) { notify('단어를 먼저 추가하세요'); return; }
@@ -1052,7 +1309,9 @@ window.checkAnswer = () => {
   const input=document.getElementById('quiz-input').value.trim(); if(!input) return;
   const v=vocabList[quizOrder[quizIdx]];
   const correct=quizMode==='word'?v.mean:v.word;
-  const isOk=input===correct||input.replace(/\s/g,'')===correct.replace(/\s/g,'')||correct.split(/[,\/,、]/).map(s=>s.trim()).some(s=>s&&input.includes(s));
+  // 쉼표로 구분된 복수정답 처리
+  const answers = correct.split(',').map(s=>s.trim()).filter(Boolean);
+  const isOk = answers.some(a=>input===a||input.replace(/\s/g,'')===a.replace(/\s/g,''));
   const el=document.getElementById('quiz-result');
   if(isOk){quizCorrect++;el.className='quiz-result correct';el.textContent='정답! — '+correct;}
   else{quizWrong++;el.className='quiz-result wrong';el.textContent='오답. 정답: '+correct;}
@@ -1107,13 +1366,70 @@ function renderPosts(posts) {
       const cDel=isAdmin||(c.uid===myUid);
       const cBan=isAdmin&&c.uid&&!c.isAdmin;
       const cTime=c.createdAt?timeAgo(typeof c.createdAt==='string'?{toDate:()=>new Date(c.createdAt)}:c.createdAt):'';
-      const cAdminBtns=cBan?`<button class="comment-del" style="color:var(--red)" onclick="deleteComment('${p.id}','${esc(c.id)}');banUserDirect('${esc(c.uid)}')">차단</button>`:'';
+      const cAdminBtns=cBan
+        ?`<button class="comment-del" onclick="deleteComment('${p.id}','${esc(c.id)}')">×</button><button class="comment-del" style="color:var(--red)" onclick="banUserDirect('${esc(c.uid)}','${p.id}','${esc(c.id)}')">차단</button>`
+        :'';
       const cDelBtn=cDel&&!cBan?`<button class="comment-del" onclick="deleteComment('${p.id}','${esc(c.id)}')">×</button>`:'';
       return `<div class="comment-item"><div class="comment-meta"><span class="comment-author ${c.isAdmin?'adm':''}">${esc(c.author||'익명')}</span><span class="comment-time">${cTime}</span>${cAdminBtns}${cDelBtn}</div><div class="comment-content">${esc(c.text||'')}</div></div>`;
     }).join('');
-    const adminBtns=canBan?`<button class="post-del" style="color:var(--red)" onclick="deletePost('${p.id}');banUserDirect('${esc(p.uid)}')">차단</button>`:
-                    canDel?`<button class="post-del" onclick="deletePost('${p.id}')">×</button>`:'';
+    const adminBtns=canBan
+      ?`<button class="post-del" onclick="deletePost('${p.id}')">×</button><button class="post-del" style="color:var(--red)" onclick="banUserDirect('${esc(p.uid)}','${p.id}',null)">차단</button>`
+      :canDel?`<button class="post-del" onclick="deletePost('${p.id}')">×</button>`:'';
     return `<div class="post-card"><div class="post-meta"><span class="post-author ${p.isAdmin?'adm':''}">${esc(p.author||'익명')}</span><span class="post-time">${p.createdAt?timeAgo(p.createdAt):''}</span>${adminBtns}</div><div class="post-content">${esc(p.content||'')}</div><div class="comments-section">${commHtml}<div class="comment-form"><input type="text" id="comment-input-${p.id}" placeholder="댓글 달기..." onkeydown="if(event.key==='Enter')submitComment('${p.id}')"><button class="btn sm primary" onclick="submitComment('${p.id}')">등록</button></div></div></div>`;
+  }).join('');
+}
+
+// ── INQUIRY ──
+let inquiryInited=false, inquiryUnsub=null;
+async function initInquiry() {
+  if(inquiryInited) return; inquiryInited=true;
+  document.getElementById('inq-status').textContent='불러오는 중...';
+  document.getElementById('inq-author-label').textContent = isAdmin ? '운영자로 답변됩니다' : '익명으로 등록됩니다';
+  try {
+    const col = isAdmin ? collection(db,'inquiries') : collection(db,'inquiries');
+    const q = query(col, orderBy('createdAt','desc'), limit(50));
+    inquiryUnsub = onSnapshot(q, snap=>{
+      const posts = snap.docs.map(d=>({id:d.id,...d.data()}));
+      const visible = isAdmin ? posts : posts.filter(p=>p.uid===currentUser?.uid);
+      renderInquiries(visible);
+      document.getElementById('inq-status').textContent=`${visible.length}개`;
+    }, err=>{ console.error(err); notify('문의 오류'); });
+  } catch(e) { notify('문의 로드 실패'); }
+}
+window.submitInquiry = async () => {
+  const content=document.getElementById('inq-content').value.trim();
+  if(!content||!currentUser) return;
+  const author = isAdmin ? '운영자' : currentUser.isAnonymous ? '익명' : (currentUser.displayName||currentUser.email||'익명');
+  try {
+    await addDoc(collection(db,'inquiries'),{content,uid:currentUser.uid,author,isAdmin,createdAt:serverTimestamp(),comments:[]});
+    document.getElementById('inq-content').value=''; notify('문의가 등록되었습니다');
+  } catch(e) { notify('등록 실패: '+e.message); }
+};
+window.deleteInquiry = async id => { try { await deleteDoc(doc(db,'inquiries',id)); notify('삭제되었습니다'); } catch(e) { notify('삭제 실패'); } };
+window.submitInquiryComment = async postId => {
+  const input=document.getElementById('inq-comment-input-'+postId); const text=input.value.trim();
+  if(!text||!currentUser) return;
+  const author = isAdmin ? '운영자' : currentUser.isAnonymous ? '익명' : (currentUser.displayName||currentUser.email||'익명');
+  try { await updateDoc(doc(db,'inquiries',postId),{comments:arrayUnion({id:Date.now()+'_'+Math.random().toString(36).slice(2),text,uid:currentUser.uid,author,isAdmin,createdAt:new Date().toISOString()})}); input.value=''; }
+  catch(e) { notify('답변 등록 실패'); }
+};
+window.deleteInquiryComment = async (postId,commentId) => {
+  try { const snap=await getDoc(doc(db,'inquiries',postId)); if(!snap.exists()) return; const comments=(snap.data().comments||[]).filter(c=>c.id!==commentId); await updateDoc(doc(db,'inquiries',postId),{comments}); }
+  catch(e) { notify('삭제 실패'); }
+};
+function renderInquiries(posts) {
+  const container=document.getElementById('inquiry-container');
+  if(!posts.length) { container.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>아직 문의가 없습니다</p></div>`; return; }
+  const myUid=currentUser?.uid;
+  container.innerHTML=posts.map(p=>{
+    const canDel=isAdmin||(p.uid===myUid);
+    const comments=p.comments||[];
+    const commHtml=comments.map(c=>{
+      const cDel=isAdmin||(c.uid===myUid);
+      const cTime=c.createdAt?timeAgo(typeof c.createdAt==='string'?{toDate:()=>new Date(c.createdAt)}:c.createdAt):'';
+      return `<div class="comment-item"><div class="comment-meta"><span class="comment-author ${c.isAdmin?'adm':''}">${esc(c.author||'익명')}</span><span class="comment-time">${cTime}</span>${cDel?`<button class="comment-del" onclick="deleteInquiryComment('${p.id}','${esc(c.id)}')">×</button>`:''}</div><div class="comment-content">${esc(c.text||'')}</div></div>`;
+    }).join('');
+    return `<div class="post-card"><div class="post-meta"><span class="post-author ${p.isAdmin?'adm':''}">${esc(p.author||'익명')}</span><span class="post-time">${p.createdAt?timeAgo(p.createdAt):''}</span>${canDel?`<button class="post-del" onclick="deleteInquiry('${p.id}')">×</button>`:''}</div><div class="post-content">${esc(p.content||'')}</div><div class="comments-section">${commHtml}<div class="comment-form"><input type="text" id="inq-comment-input-${p.id}" placeholder="${isAdmin?'답변 달기...':'추가 문의...'}" onkeydown="if(event.key==='Enter')submitInquiryComment('${p.id}')"><button class="btn sm primary" onclick="submitInquiryComment('${p.id}')">${isAdmin?'답변':'등록'}</button></div></div></div>`;
   }).join('');
 }
 
@@ -1185,6 +1501,7 @@ function openCalModal(dateKey,d) {
     const lines=[];
     if(s.pomo) lines.push(s.pomo);
     if(s.sw) lines.push(s.sw);
+    if(s.todo) lines.push(s.todo);
     statsEl.innerHTML=lines.join('&nbsp;&nbsp;·&nbsp;&nbsp;');
     statsEl.style.display='block';
   } else { statsEl.style.display='none'; }
