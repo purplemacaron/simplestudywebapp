@@ -846,12 +846,14 @@ window.swReset = () => {
   document.getElementById('sw-laps').innerHTML='';
 };
 (()=>{
-  const saved=localStorage.getItem('ss_sw');
-  if(saved) {
-    swElapsed=parseInt(saved); swTick();
-    swRunning=true; document.getElementById('sw-btn').textContent='일시정지';
-    swStart=Date.now()-swElapsed;
-    swInterval=setInterval(()=>{ swTick(); localStorage.setItem('ss_sw',swElapsed); },100);
+  const saved = localStorage.getItem('ss_sw');
+  const val = parseInt(saved);
+  if (saved && !isNaN(val) && val > 0 && val < 86400000) {
+    swElapsed = val;
+    swRunning = false;
+    swTick();
+  } else {
+    localStorage.removeItem('ss_sw');
   }
 })();
 
