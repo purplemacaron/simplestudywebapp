@@ -758,6 +758,7 @@ window.submitBannedInquiry = async () => {
     notify('문의가 등록되었습니다');
   } catch(e) { notify('등록 실패: '+e.message); }
 };
+window.doSignOut = async () => {
   if (!confirm('로그아웃하시겠습니까?')) return;
   if (postsUnsub) postsUnsub();
   await fbSignOut(auth);
@@ -1580,4 +1581,4 @@ document.getElementById('cal-modal').addEventListener('click',e=>{ if(e.target==
 
 </script>
 </body>
-      </html>
+  </html>
