@@ -610,7 +610,9 @@ onAuthStateChanged(auth, async user => {
     badge.textContent = '운영자'; badge.className = 'badge badge-admin';
   } else {
     const badge = document.getElementById('role-badge');
-    badge.textContent = '익명'; badge.className = 'badge badge-user';
+    const isAnon = user.isAnonymous;
+    badge.textContent = isAnon ? '익명' : (user.displayName || user.email || '유저');
+    badge.className = 'badge badge-user';
   }
   document.getElementById('post-author-label').textContent = isAdmin ? '운영자로 게시됩니다' : '익명으로 게시됩니다';
 
@@ -1002,14 +1004,16 @@ async function initCommunity() {
 window.submitPost = async () => {
   const content=document.getElementById('post-content').value.trim();
   if(!content||!currentUser) return;
-  try { await addDoc(collection(db,'posts'),{content,uid:currentUser.uid,author:isAdmin?'운영자':'익명',isAdmin,createdAt:serverTimestamp(),comments:[]}); document.getElementById('post-content').value=''; notify('게시되었습니다'); }
+  const author = isAdmin ? '운영자' : currentUser.isAnonymous ? '익명' : (currentUser.displayName || currentUser.email || '익명');
+  try { await addDoc(collection(db,'posts'),{content,uid:currentUser.uid,author,isAdmin,createdAt:serverTimestamp(),comments:[]}); document.getElementById('post-content').value=''; notify('게시되었습니다'); }
   catch(e) { notify('게시 실패: '+e.message); }
 };
 window.deletePost = async postId => { try { await deleteDoc(doc(db,'posts',postId)); notify('삭제되었습니다'); } catch(e) { notify('삭제 실패'); } };
 window.submitComment = async postId => {
   const input=document.getElementById('comment-input-'+postId); const text=input.value.trim();
   if(!text||!currentUser) return;
-  try { await updateDoc(doc(db,'posts',postId),{comments:arrayUnion({id:Date.now()+'_'+Math.random().toString(36).slice(2),text,uid:currentUser.uid,author:isAdmin?'운영자':'익명',isAdmin,createdAt:new Date().toISOString()})}); input.value=''; }
+  const author = isAdmin ? '운영자' : currentUser.isAnonymous ? '익명' : (currentUser.displayName || currentUser.email || '익명');
+  try { await updateDoc(doc(db,'posts',postId),{comments:arrayUnion({id:Date.now()+'_'+Math.random().toString(36).slice(2),text,uid:currentUser.uid,author,isAdmin,createdAt:new Date().toISOString()})}); input.value=''; }
   catch(e) { notify('댓글 등록 실패'); }
 };
 window.deleteComment = async (postId,commentId) => {
