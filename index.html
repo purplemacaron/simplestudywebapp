@@ -1774,19 +1774,32 @@ window.fcRestartWrong = () => {
 
 function showFcCard() {
   const v = fcCards[fcIdx];
+  const inner = document.getElementById('fc-card-inner');
+  const card = document.getElementById('fc-card');
+
+  // transition 끄고 즉시 앞면으로 복귀
+  inner.style.transition = 'none';
+  card.classList.remove('fc-flipped');
+  fcFlipped = false;
+
+  // 내용 세팅
   document.getElementById('fc-front-text').textContent = v.word;
   document.getElementById('fc-back-text').textContent = v.mean;
-  // image if present
   const imgWrap = document.getElementById('fc-back-img');
   if(v.img) {
     imgWrap.style.display = '';
     imgWrap.innerHTML = `<img src="${v.img}" style="max-height:120px;max-width:100%;border-radius:8px">`;
   } else { imgWrap.style.display = 'none'; imgWrap.innerHTML = ''; }
-  // reset flip
-  fcFlipped = false;
-  document.getElementById('fc-card').classList.remove('fc-flipped');
   document.getElementById('fc-action-btns').style.display = 'none';
-  // progress
+
+  // 다음 프레임에서 transition 복원
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      inner.style.transition = 'transform .5s';
+    });
+  });
+
+  // 진행률
   const total = fcCards.length;
   document.getElementById('fc-counter').textContent = `${fcIdx+1} / ${total}`;
   document.getElementById('fc-score').textContent = `알았음 ${fcKnown} · 모름 ${fcUnknown}`;
