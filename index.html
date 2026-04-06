@@ -2102,21 +2102,79 @@ function eqInitOptions(opts) {
   eqRenderOptions();
 }
 
+function eqSyncFromDOM() {
+  // 현재 DOM에서 입력값을 eqOptions에 동기화
+  const wrap = document.getElementById('eq-options-wrap');
+  const rows = wrap.querySelectorAll('.eq-option-row');
+  rows.forEach((row, i) => {
+    if(eqOptions[i]) eqOptions[i].text = row.querySelector('input[type=text]').value;
+  });
+}
+
 function eqRenderOptions() {
-  document.getElementById('eq-options-wrap').innerHTML = eqOptions.map((o,i)=>`
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-      <input type="radio" name="eq-correct" ${o.correct?'checked':''} onchange="eqSetCorrect(${i})" style="cursor:pointer;accent-color:var(--b500)">
-      <input type="text" value="${esc(o.text)}" placeholder="보기 ${i+1}" oninput="eqOptions[${i}].text=this.value" style="flex:1;font-size:13px">
-      ${eqOptions.length>2?`<button onclick="eqRemoveOption(${i})" style="background:none;border:none;cursor:pointer;color:var(--g300);font-size:16px;padding:0 4px" title="삭제">×</button>`:''}
-    </div>`).join('');
+  const wrap = document.getElementById('eq-options-wrap');
+  wrap.innerHTML = '';
+  eqOptions.forEach((o, i) => {
+    const row = document.createElement('div');
+    row.className = 'eq-option-row';
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px';
+
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'eq-correct';
+    radio.checked = o.correct;
+    radio.style.cssText = 'cursor:pointer;accent-color:var(--b500);flex-shrink:0';
+    radio.addEventListener('change', () => {
+      eqSyncFromDOM();
+      eqOptions.forEach((x,j) => x.correct = (j===i));
+      // 라디오만 업데이트, 텍스트 건드리지 않음
+      wrap.querySelectorAll('input[type=radio]').forEach((r,j) => r.checked=(j===i));
+    });
+
+    const txt = document.createElement('input');
+    txt.type = 'text';
+    txt.value = o.text;
+    txt.placeholder = '보기 ' + (i+1);
+    txt.style.cssText = 'flex:1;font-size:13px;padding:9px 12px;border:1.5px solid var(--g200);border-radius:var(--rs);outline:none;font-family:var(--font);transition:border-color .15s';
+    txt.addEventListener('focus', () => txt.style.borderColor='var(--b400)');
+    txt.addEventListener('blur', () => txt.style.borderColor='var(--g200)');
+
+    row.appendChild(radio);
+    row.appendChild(txt);
+
+    if(eqOptions.length > 2) {
+      const del = document.createElement('button');
+      del.textContent = '×';
+      del.style.cssText = 'background:none;border:none;cursor:pointer;color:var(--g300);font-size:18px;padding:0 4px;line-height:1';
+      del.title = '삭제';
+      del.addEventListener('click', () => {
+        eqSyncFromDOM();
+        if(eqOptions.length<=2){notify('보기는 최소 2개');return;}
+        const wasCorrect = eqOptions[i].correct;
+        eqOptions.splice(i,1);
+        if(wasCorrect) eqOptions[0].correct=true;
+        eqRenderOptions();
+      });
+      row.appendChild(del);
+    }
+
+    wrap.appendChild(row);
+  });
 }
 
 window.eqSetCorrect = idx => { eqOptions.forEach((o,i)=>o.correct=(i===idx)); eqRenderOptions(); };
 window.eqAddOption = () => {
   if(eqOptions.length>=6){notify('보기는 최대 6개');return;}
-  eqOptions.push({text:'',correct:false}); eqRenderOptions();
+  eqSyncFromDOM();
+  eqOptions.push({text:'',correct:false});
+  eqRenderOptions();
+  // 새로 추가된 보기에 포커스
+  const rows = document.getElementById('eq-options-wrap').querySelectorAll('.eq-option-row');
+  const lastInput = rows[rows.length-1]?.querySelector('input[type=text]');
+  if(lastInput) lastInput.focus();
 };
 window.eqRemoveOption = idx => {
+  eqSyncFromDOM();
   if(eqOptions.length<=2){notify('보기는 최소 2개');return;}
   const wasCorrect = eqOptions[idx].correct;
   eqOptions.splice(idx,1);
@@ -2144,6 +2202,7 @@ window.eqRemoveImg = () => {
 
 // ── 저장 ──
 window.eqSaveQuestion = async () => {
+  eqSyncFromDOM(); // DOM에서 최신 보기 값 동기화
   const text = document.getElementById('eq-q-text').value.trim();
   if(!text){notify('문제를 입력하세요');return;}
   const type = eqGetType();
