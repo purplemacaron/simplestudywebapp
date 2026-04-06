@@ -741,18 +741,29 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
     </div>
     <!-- 문장 입력 탭 -->
     <div id="fb-setup" style="">
-      <div style="font-size:13px;color:var(--g500);margin-bottom:8px">문장을 입력하고, 가릴 단어를 <b>[ ]</b>로 감싸세요.</div>
-      <div style="font-size:12px;color:var(--b600);background:var(--b50);border:1px solid var(--b100);border-radius:var(--rs);padding:10px 14px;margin-bottom:12px">
-        예시: 대한민국의 수도는 [서울]입니다. 오늘 날씨는 [맑음]입니다.
+      <!-- 모드 선택 -->
+      <div style="display:flex;gap:6px;margin-bottom:14px">
+        <button class="btn sm" id="fb-mode-manual" onclick="fbSetMode('manual')" style="background:var(--b600);color:#fff;border-color:var(--b600)">직접 지정</button>
+        <button class="btn sm" id="fb-mode-auto" onclick="fbSetMode('auto')">랜덤 자동</button>
       </div>
-      <textarea id="fb-input" placeholder="문장을 여기에 입력하세요..." style="width:100%;min-height:120px;font-size:14px;margin-bottom:10px"></textarea>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+      <!-- 직접 지정 안내 -->
+      <div id="fb-hint-manual" style="font-size:12px;color:var(--b600);background:var(--b50);border:1px solid var(--b100);border-radius:var(--rs);padding:10px 14px;margin-bottom:10px">
+        가릴 단어를 <b>[ ]</b>로 감싸세요. 예: 대한민국의 수도는 [서울]입니다.
+      </div>
+      <!-- 랜덤 자동 안내 -->
+      <div id="fb-hint-auto" style="display:none;font-size:12px;color:var(--b600);background:var(--b50);border:1px solid var(--b100);border-radius:var(--rs);padding:10px 14px;margin-bottom:10px">
+        문장을 그냥 입력하면 단어를 랜덤으로 선택해 가립니다.
+      </div>
+      <textarea id="fb-input" placeholder="문장을 입력하세요..." style="width:100%;min-height:120px;font-size:14px;margin-bottom:10px"></textarea>
+      <!-- 랜덤 옵션 -->
+      <div id="fb-auto-options" style="display:none;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
         <label style="font-size:12px;color:var(--g500);display:flex;align-items:center;gap:6px">
           가릴 비율
           <select id="fb-mask-ratio" style="font-size:12px;padding:5px 8px">
-            <option value="1">모두 가리기</option>
-            <option value="0.5">절반 랜덤</option>
-            <option value="0.3">일부 랜덤</option>
+            <option value="0.3">30%</option>
+            <option value="0.5" selected>50%</option>
+            <option value="0.7">70%</option>
+            <option value="1">전체</option>
           </select>
         </label>
       </div>
@@ -1900,29 +1911,46 @@ window.deleteFbSet = async i => {
   renderFbSavedList();
 };
 
+let fbMode = 'manual';
+window.fbSetMode = mode => {
+  fbMode = mode;
+  const isAuto = mode === 'auto';
+  document.getElementById('fb-mode-manual').style.cssText = isAuto ? '' : 'background:var(--b600);color:#fff;border-color:var(--b600)';
+  document.getElementById('fb-mode-auto').style.cssText = isAuto ? 'background:var(--b600);color:#fff;border-color:var(--b600)' : '';
+  document.getElementById('fb-hint-manual').style.display = isAuto ? 'none' : '';
+  document.getElementById('fb-hint-auto').style.display = isAuto ? '' : 'none';
+  document.getElementById('fb-auto-options').style.display = isAuto ? 'flex' : 'none';
+};
+
 window.startFillBlank = () => {
   const raw = document.getElementById('fb-input').value.trim();
   if(!raw) { notify('문장을 입력하세요'); return; }
-  // 문장 파싱: [단어] 형식 찾기
-  const regex = /\[[^\]]+\]/g;
-  const found = raw.match(regex);
-  if(!found) { notify('가릴 단어를 [단어] 형식으로 감싸주세요'); return; }
-  // 문장 분리 (줄바꿈 또는 마침표 단위)
   const sentenceRaw = raw.split(/\n/).map(s=>s.trim()).filter(Boolean);
-  // 비율 설정
-  const ratio = parseFloat(document.getElementById('fb-mask-ratio').value);
-  fbSentences = sentenceRaw.map(s=>{
-    const blanks = [];
-    const allBlanks = [...s.matchAll(/\[([^\]]+)\]/g)];
-    let selected;
-    if(ratio >= 1) {
-      selected = allBlanks;
-    } else {
-      const count = Math.max(1, Math.round(allBlanks.length * ratio));
-      selected = [...allBlanks].sort(()=>Math.random()-.5).slice(0,count);
-    }
-    return { raw: s, blanks: selected.map(m=>({match:m[0], word:m[1], index:m.index})) };
-  });
+
+  if(fbMode === 'manual') {
+    // [단어] 형식 파싱
+    const hasBlank = sentenceRaw.some(s=>/\[[^\]]+\]/.test(s));
+    if(!hasBlank) { notify('가릴 단어를 [단어] 형식으로 감싸주세요'); return; }
+    fbSentences = sentenceRaw.map(s=>{
+      const allBlanks = [...s.matchAll(/\[([^\]]+)\]/g)];
+      return { raw: s, blanks: allBlanks.map(m=>({match:m[0], word:m[1]})) };
+    });
+  } else {
+    // 랜덤 자동: 단어 단위로 랜덤 선택
+    const ratio = parseFloat(document.getElementById('fb-mask-ratio').value);
+    fbSentences = sentenceRaw.map(s=>{
+      // 의미있는 단어만 추출 (2글자 이상, 숫자/특수문자 제외)
+      const wordRegex = /[가-힣a-zA-Z0-9]+/g;
+      const allWords = [...s.matchAll(wordRegex)].filter(m=>m[0].length>=2);
+      if(!allWords.length) return { raw: s, blanks: [] };
+      const count = Math.max(1, Math.round(allWords.length * ratio));
+      const selected = [...allWords].sort(()=>Math.random()-.5).slice(0, count);
+      // match 형식으로 변환 (원문 그대로 사용)
+      const blanks = selected.map(m=>({ match: m[0], word: m[0] }));
+      return { raw: s, blanks };
+    });
+  }
+
   fbIdx = 0; fbCorrectTotal = 0; fbWrongTotal = 0;
   document.getElementById('fb-setup').style.display = 'none';
   document.getElementById('fb-quiz-area').style.display = '';
@@ -1934,14 +1962,38 @@ function showFbSentence() {
   const total = fbSentences.length;
   document.getElementById('fb-quiz-counter').textContent = `${fbIdx+1} / ${total}`;
   document.getElementById('fb-quiz-score').textContent = `정답 ${fbCorrectTotal} / 오답 ${fbWrongTotal}`;
-  // 문장을 HTML로 변환, 가릴 단어는 input으로
-  let html = esc(s.raw);
-  // blanks: replace [word] with input
-  s.blanks.forEach(b=>{
-    html = html.replace(esc(b.match), `<span class="fb-blank"><input type="text" placeholder="?" autocomplete="off" style="width:${Math.max(50, b.word.length*16)}px" data-answer="${esc(b.word)}"></span>`);
-  });
-  // 나머지 [word] (가리지 않은 것)는 그냥 표시
-  html = html.replace(/\[([^\]]+)\]/g, '$1');
+
+  let html;
+  if(fbMode === 'manual') {
+    // [단어] → input 변환
+    html = esc(s.raw);
+    s.blanks.forEach(b=>{
+      html = html.replace(esc(b.match), `<span class="fb-blank"><input type="text" placeholder="?" autocomplete="off" style="width:${Math.max(50, b.word.length*18)}px" data-answer="${esc(b.word)}"></span>`);
+    });
+    // 가리지 않은 [word]는 그냥 표시
+    html = html.replace(/\[([^\]]+)\]/g, '$1');
+  } else {
+    // 랜덤 자동: 원문에서 선택된 단어를 input으로 교체
+    // 중복 단어 처리를 위해 replace 한 번씩만
+    html = esc(s.raw);
+    // 이미 교체된 위치 추적을 위해 placeholder 방식 사용
+    const replaced = new Map(); // word → count
+    s.blanks.forEach(b=>{
+      const key = esc(b.word);
+      const cnt = replaced.get(key) || 0;
+      // nth occurrence 교체
+      let found = 0;
+      html = html.replace(new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'g'), match => {
+        found++;
+        if(found === cnt + 1) {
+          replaced.set(key, cnt + 1);
+          return `<span class="fb-blank"><input type="text" placeholder="?" autocomplete="off" style="width:${Math.max(50, b.word.length*18)}px" data-answer="${key}"></span>`;
+        }
+        return match;
+      });
+    });
+  }
+
   document.getElementById('fb-quiz-sentence').innerHTML = html;
   document.getElementById('fb-check-btn').style.display = 'inline-flex';
   document.getElementById('fb-next-btn').style.display = 'none';
@@ -2530,4 +2582,4 @@ document.getElementById('cal-modal').addEventListener('click',e=>{ if(e.target==
 
 </script>
 </body>
-  </html>
+          </html>
