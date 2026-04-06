@@ -739,51 +739,59 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
       문장 채우기
     </div>
-    <!-- 문장 입력 탭 -->
-    <div id="fb-setup" style="">
-      <!-- 모드 선택 -->
-      <div style="display:flex;gap:6px;margin-bottom:14px">
-        <button class="btn sm" id="fb-mode-manual" onclick="fbSetMode('manual')" style="background:var(--b600);color:#fff;border-color:var(--b600)">직접 지정</button>
-        <button class="btn sm" id="fb-mode-auto" onclick="fbSetMode('auto')">랜덤 자동</button>
+
+    <!-- 세트 관리 화면 -->
+    <div id="fb-setup">
+      <!-- 세트 탭 -->
+      <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+        <div id="fb-set-tabs" style="display:flex;gap:6px;flex-wrap:wrap;flex:1"></div>
+        <button class="btn sm primary" onclick="fbCreateSet()">+ 새 세트</button>
       </div>
-      <!-- 직접 지정 안내 -->
-      <div id="fb-hint-manual" style="font-size:12px;color:var(--b600);background:var(--b50);border:1px solid var(--b100);border-radius:var(--rs);padding:10px 14px;margin-bottom:10px">
-        가릴 단어를 <b>[ ]</b>로 감싸세요. 예: 대한민국의 수도는 [서울]입니다.
-      </div>
-      <!-- 랜덤 자동 안내 -->
-      <div id="fb-hint-auto" style="display:none;font-size:12px;color:var(--b600);background:var(--b50);border:1px solid var(--b100);border-radius:var(--rs);padding:10px 14px;margin-bottom:10px">
-        문장을 그냥 입력하면 단어를 랜덤으로 선택해 가립니다.
-      </div>
-      <textarea id="fb-input" placeholder="문장을 입력하세요..." style="width:100%;min-height:120px;font-size:14px;margin-bottom:10px"></textarea>
-      <!-- 랜덤 옵션 -->
-      <div id="fb-auto-options" style="display:none;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
-        <label style="font-size:12px;color:var(--g500);display:flex;align-items:center;gap:6px">
-          가릴 비율
-          <select id="fb-mask-ratio" style="font-size:12px;padding:5px 8px">
-            <option value="0.3">30%</option>
-            <option value="0.5" selected>50%</option>
-            <option value="0.7">70%</option>
-            <option value="1">전체</option>
-          </select>
-        </label>
+      <!-- 현재 세트 문장 목록 -->
+      <div id="fb-sentence-list" style="margin-bottom:14px"></div>
+      <!-- 문장 추가 영역 -->
+      <div style="border:1px solid var(--g200);border-radius:var(--rs);padding:14px;background:var(--g50);margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--g500);margin-bottom:10px">문장 추가</div>
+        <!-- 모드 선택 -->
+        <div style="display:flex;gap:6px;margin-bottom:10px">
+          <button class="btn sm" id="fb-mode-manual" onclick="fbSetMode('manual')" style="background:var(--b600);color:#fff;border-color:var(--b600)">직접 지정</button>
+          <button class="btn sm" id="fb-mode-auto" onclick="fbSetMode('auto')">랜덤 자동</button>
+        </div>
+        <div id="fb-hint-manual" style="font-size:11px;color:var(--b600);margin-bottom:8px">
+          가릴 단어를 [ ]로 감싸세요. 예: 수도는 [서울]입니다.
+        </div>
+        <div id="fb-hint-auto" style="display:none;font-size:11px;color:var(--b600);margin-bottom:8px">
+          문장을 입력하면 단어를 랜덤으로 선택해 가립니다.
+        </div>
+        <textarea id="fb-input" placeholder="문장을 입력하세요 (줄바꿈으로 여러 문장 한번에 추가)" style="width:100%;min-height:80px;font-size:13px;margin-bottom:8px"></textarea>
+        <div id="fb-auto-options" style="display:none;margin-bottom:8px">
+          <label style="font-size:12px;color:var(--g500);display:flex;align-items:center;gap:6px">
+            가릴 비율
+            <select id="fb-mask-ratio" style="font-size:12px;padding:5px 8px">
+              <option value="0.3">30%</option>
+              <option value="0.5" selected>50%</option>
+              <option value="0.7">70%</option>
+              <option value="1">전체</option>
+            </select>
+          </label>
+        </div>
+        <button class="btn sm primary" onclick="fbAddSentences()">추가</button>
       </div>
       <div class="btn-group" style="justify-content:flex-start">
-        <button class="btn primary" onclick="startFillBlank()">시작</button>
-        <button class="btn sm" onclick="saveFbSentences()" id="fb-save-btn">문장 저장</button>
-        <button class="btn sm" onclick="loadFbSentences()">저장된 불러오기</button>
-      </div>
-      <div id="fb-saved-list" style="margin-top:14px;display:none">
-        <div style="font-size:12px;font-weight:700;color:var(--g500);margin-bottom:8px">저장된 문장 세트</div>
-        <div id="fb-saved-items"></div>
+        <button class="btn primary" onclick="startFillBlank()">시험 시작</button>
       </div>
     </div>
+
     <!-- 퀴즈 영역 -->
     <div id="fb-quiz-area" style="display:none">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <span id="fb-quiz-counter" style="font-size:12px;color:var(--g400)">1 / 1</span>
         <span id="fb-quiz-score" style="font-size:12px;color:var(--g400)">정답 0 / 오답 0</span>
       </div>
-      <div id="fb-quiz-sentence" style="font-size:18px;line-height:2.2;color:var(--g800);margin-bottom:16px;padding:16px;background:var(--g50);border-radius:var(--rs);border:1px solid var(--g100)"></div>
+      <div style="height:4px;background:var(--g100);border-radius:99px;margin-bottom:14px;overflow:hidden">
+        <div id="fb-prog-fill" style="height:100%;background:linear-gradient(90deg,var(--b400),var(--b600));border-radius:99px;transition:width .4s;width:0%"></div>
+      </div>
+      <div id="fb-quiz-sentence" style="font-size:17px;line-height:2.4;color:var(--g800);margin-bottom:16px;padding:16px;background:var(--g50);border-radius:var(--rs);border:1px solid var(--g100)"></div>
       <div class="btn-group">
         <button class="btn primary" id="fb-check-btn" onclick="fbCheckAll()">정답 확인</button>
         <button class="btn" id="fb-next-btn" onclick="fbNextSentence()" style="display:none">다음 문장</button>
@@ -1513,7 +1521,6 @@ let decks=[], currentDeckId=null;
 // ── NEW FEATURE vars ──
 let eqSelectedDecks=[], eqAllWords=[], eqOrder=[], eqEqIdx=0, eqCorrect=0, eqWrong=0, eqAnswered=false, eqPhotos={};
 let fcCards=[], fcIdx=0, fcKnown=0, fcUnknown=0, fcFlipped=false, fcWrongList=[];
-let fbSentences=[], fbIdx=0, fbCorrectTotal=0, fbWrongTotal=0, fbSavedSets=[];
 
 async function loadVocab() {
   // 덱 목록 로드
@@ -1858,187 +1865,228 @@ window.stopFlashcard = () => {
 };
 
 // ── FILL IN THE BLANK ──
+// fbSets: [{id, name, mode, ratio, sentences:[{id, raw, mode, ratio}]}]
+let fbSets=[], fbCurrentSetId=null;
+let fbSentences=[], fbIdx=0, fbCorrectTotal=0, fbWrongTotal=0;
+let fbMode='manual';
+
 function initFillBlank() {
-  loadFbSavedSets();
+  loadFbSets();
 }
 
-async function loadFbSavedSets() {
-  const data = await fsGet('data/fillblank', {sets:[]});
-  fbSavedSets = data.sets || [];
-  renderFbSavedList();
+async function loadFbSets() {
+  const data = await fsGet('data/fillblank2', {sets:[]});
+  fbSets = data.sets || [];
+  if(!fbSets.length) {
+    fbSets = [{id:'fb_default', name:'기본 세트', sentences:[]}];
+    await saveFbSets();
+  }
+  if(!fbCurrentSetId) fbCurrentSetId = fbSets[0].id;
+  fbRenderSetTabs();
+  fbRenderSentenceList();
 }
 
-async function saveFbSentencesData() {
-  await fsSet('data/fillblank', {sets: fbSavedSets});
+async function saveFbSets() {
+  await fsSet('data/fillblank2', {sets: fbSets});
 }
 
-window.saveFbSentences = async () => {
-  const text = document.getElementById('fb-input').value.trim();
-  if(!text) { notify('문장을 입력하세요'); return; }
-  const name = prompt('세트 이름을 입력하세요') || ('세트 '+(fbSavedSets.length+1));
-  fbSavedSets.push({name: name.trim(), text, id: Date.now()});
-  await saveFbSentencesData();
-  renderFbSavedList();
-  notify('저장되었습니다');
+function fbCurrentSet() {
+  return fbSets.find(s=>s.id===fbCurrentSetId) || fbSets[0];
+}
+
+// ── 세트 관리 ──
+window.fbCreateSet = async () => {
+  const name = prompt('세트 이름을 입력하세요');
+  if(!name||!name.trim()) return;
+  const id = 'fb_'+Date.now();
+  fbSets.push({id, name:name.trim(), sentences:[]});
+  fbCurrentSetId = id;
+  await saveFbSets();
+  fbRenderSetTabs();
+  fbRenderSentenceList();
 };
 
-window.loadFbSentences = () => {
-  document.getElementById('fb-saved-list').style.display = '';
+function fbRenderSetTabs() {
+  document.getElementById('fb-set-tabs').innerHTML = fbSets.map(s=>`
+    <button class="btn sm ${s.id===fbCurrentSetId?'primary':''}" onclick="fbSwitchSet('${s.id}')">
+      ${esc(s.name)}
+      ${fbSets.length>1?`<span onclick="event.stopPropagation();fbDeleteSet('${s.id}')" style="margin-left:4px;opacity:.6;font-size:11px">×</span>`:''}
+    </button>`).join('');
+}
+
+window.fbSwitchSet = id => {
+  fbCurrentSetId = id;
+  fbRenderSetTabs();
+  fbRenderSentenceList();
 };
 
-function renderFbSavedList() {
-  const wrap = document.getElementById('fb-saved-items');
-  if(!fbSavedSets.length) { wrap.innerHTML='<div style="font-size:13px;color:var(--g400)">저장된 세트 없음</div>'; return; }
-  wrap.innerHTML = fbSavedSets.map((s,i)=>`
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--g50);border:1px solid var(--g100);border-radius:var(--rs);margin-bottom:6px;gap:8px">
-      <span style="font-size:13px;font-weight:600">${esc(s.name)}</span>
-      <div style="display:flex;gap:6px">
-        <button class="btn xs primary" onclick="loadFbSet(${i})">불러오기</button>
-        <button class="btn xs danger" onclick="deleteFbSet(${i})">삭제</button>
+window.fbDeleteSet = async id => {
+  if(fbSets.length<=1){notify('마지막 세트는 삭제할 수 없습니다');return;}
+  if(!confirm('이 세트와 문장을 모두 삭제할까요?')) return;
+  fbSets = fbSets.filter(s=>s.id!==id);
+  if(fbCurrentSetId===id) fbCurrentSetId = fbSets[0].id;
+  await saveFbSets();
+  fbRenderSetTabs();
+  fbRenderSentenceList();
+};
+
+// ── 문장 목록 ──
+function fbRenderSentenceList() {
+  const set = fbCurrentSet();
+  const el = document.getElementById('fb-sentence-list');
+  if(!set.sentences.length) {
+    el.innerHTML='<div style="font-size:13px;color:var(--g400);padding:10px 0;text-align:center">문장을 추가하세요</div>';
+    return;
+  }
+  el.innerHTML = set.sentences.map((s,i)=>`
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--g50);border:1px solid var(--g100);border-radius:var(--rs);margin-bottom:5px">
+      <div style="font-size:11px;font-weight:700;color:var(--b600);min-width:20px;padding-top:1px">${i+1}</div>
+      <div style="flex:1;font-size:13px;color:var(--g700);word-break:break-all">${esc(s.raw)}</div>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <span style="font-size:10px;padding:2px 6px;background:${s.mode==='auto'?'var(--b100)':'#dcfce7'};color:${s.mode==='auto'?'var(--b700)':'#16a34a'};border-radius:99px">${s.mode==='auto'?'랜덤':'직접'}</span>
+        <button class="btn xs danger" onclick="fbDeleteSentence('${s.id}')">삭제</button>
       </div>
     </div>`).join('');
 }
 
-window.loadFbSet = i => {
-  document.getElementById('fb-input').value = fbSavedSets[i].text;
-  document.getElementById('fb-saved-list').style.display = 'none';
-  notify('불러왔습니다');
+window.fbDeleteSentence = async id => {
+  const set = fbCurrentSet();
+  set.sentences = set.sentences.filter(s=>s.id!==id);
+  await saveFbSets();
+  fbRenderSentenceList();
 };
 
-window.deleteFbSet = async i => {
-  fbSavedSets.splice(i,1);
-  await saveFbSentencesData();
-  renderFbSavedList();
-};
-
-let fbMode = 'manual';
+// ── 모드 전환 ──
 window.fbSetMode = mode => {
   fbMode = mode;
-  const isAuto = mode === 'auto';
-  document.getElementById('fb-mode-manual').style.cssText = isAuto ? '' : 'background:var(--b600);color:#fff;border-color:var(--b600)';
-  document.getElementById('fb-mode-auto').style.cssText = isAuto ? 'background:var(--b600);color:#fff;border-color:var(--b600)' : '';
-  document.getElementById('fb-hint-manual').style.display = isAuto ? 'none' : '';
-  document.getElementById('fb-hint-auto').style.display = isAuto ? '' : 'none';
-  document.getElementById('fb-auto-options').style.display = isAuto ? 'flex' : 'none';
+  const isAuto = mode==='auto';
+  document.getElementById('fb-mode-manual').style.cssText = isAuto?'':'background:var(--b600);color:#fff;border-color:var(--b600)';
+  document.getElementById('fb-mode-auto').style.cssText = isAuto?'background:var(--b600);color:#fff;border-color:var(--b600)':'';
+  document.getElementById('fb-hint-manual').style.display = isAuto?'none':'';
+  document.getElementById('fb-hint-auto').style.display = isAuto?'':'none';
+  document.getElementById('fb-auto-options').style.display = isAuto?'block':'none';
 };
 
-window.startFillBlank = () => {
+// ── 문장 추가 ──
+window.fbAddSentences = async () => {
   const raw = document.getElementById('fb-input').value.trim();
-  if(!raw) { notify('문장을 입력하세요'); return; }
-  const sentenceRaw = raw.split(/\n/).map(s=>s.trim()).filter(Boolean);
-
-  if(fbMode === 'manual') {
-    // [단어] 형식 파싱
-    const hasBlank = sentenceRaw.some(s=>/\[[^\]]+\]/.test(s));
-    if(!hasBlank) { notify('가릴 단어를 [단어] 형식으로 감싸주세요'); return; }
-    fbSentences = sentenceRaw.map(s=>{
-      const allBlanks = [...s.matchAll(/\[([^\]]+)\]/g)];
-      return { raw: s, blanks: allBlanks.map(m=>({match:m[0], word:m[1]})) };
-    });
-  } else {
-    // 랜덤 자동: 단어 단위로 랜덤 선택
-    const ratio = parseFloat(document.getElementById('fb-mask-ratio').value);
-    fbSentences = sentenceRaw.map(s=>{
-      // 의미있는 단어만 추출 (2글자 이상, 숫자/특수문자 제외)
-      const wordRegex = /[가-힣a-zA-Z0-9]+/g;
-      const allWords = [...s.matchAll(wordRegex)].filter(m=>m[0].length>=2);
-      if(!allWords.length) return { raw: s, blanks: [] };
-      const count = Math.max(1, Math.round(allWords.length * ratio));
-      const selected = [...allWords].sort(()=>Math.random()-.5).slice(0, count);
-      // match 형식으로 변환 (원문 그대로 사용)
-      const blanks = selected.map(m=>({ match: m[0], word: m[0] }));
-      return { raw: s, blanks };
-    });
+  if(!raw){notify('문장을 입력하세요');return;}
+  const lines = raw.split(/\n/).map(s=>s.trim()).filter(Boolean);
+  if(fbMode==='manual'){
+    const hasBlank = lines.some(s=>/\[[^\]]+\]/.test(s));
+    if(!hasBlank){notify('가릴 단어를 [단어] 형식으로 감싸주세요');return;}
   }
+  const ratio = parseFloat(document.getElementById('fb-mask-ratio').value)||0.5;
+  const set = fbCurrentSet();
+  lines.forEach(line=>{
+    set.sentences.push({id:'s_'+Date.now()+'_'+Math.random().toString(36).slice(2), raw:line, mode:fbMode, ratio});
+  });
+  await saveFbSets();
+  document.getElementById('fb-input').value='';
+  fbRenderSentenceList();
+  notify(lines.length+'개 문장 추가됨');
+};
 
-  fbIdx = 0; fbCorrectTotal = 0; fbWrongTotal = 0;
-  document.getElementById('fb-setup').style.display = 'none';
-  document.getElementById('fb-quiz-area').style.display = '';
+// ── 시험 시작 ──
+window.startFillBlank = () => {
+  const set = fbCurrentSet();
+  if(!set.sentences.length){notify('문장을 먼저 추가하세요');return;}
+  // 각 문장을 파싱
+  fbSentences = set.sentences.map(s=>{
+    if(s.mode==='manual'){
+      const blanks = [...s.raw.matchAll(/\[([^\]]+)\]/g)].map(m=>({match:m[0],word:m[1]}));
+      return {raw:s.raw, mode:'manual', blanks};
+    } else {
+      const ratio = s.ratio||0.5;
+      const wordRegex = /[가-힣a-zA-Z0-9]+/g;
+      const allWords = [...s.raw.matchAll(wordRegex)].filter(m=>m[0].length>=2);
+      const count = Math.max(1, Math.round(allWords.length*ratio));
+      const selected = [...allWords].sort(()=>Math.random()-.5).slice(0,count);
+      return {raw:s.raw, mode:'auto', blanks:selected.map(m=>({match:m[0],word:m[0]}))};
+    }
+  });
+  fbIdx=0; fbCorrectTotal=0; fbWrongTotal=0;
+  document.getElementById('fb-setup').style.display='none';
+  document.getElementById('fb-quiz-area').style.display='';
   showFbSentence();
 };
 
 function showFbSentence() {
   const s = fbSentences[fbIdx];
   const total = fbSentences.length;
-  document.getElementById('fb-quiz-counter').textContent = `${fbIdx+1} / ${total}`;
-  document.getElementById('fb-quiz-score').textContent = `정답 ${fbCorrectTotal} / 오답 ${fbWrongTotal}`;
+  document.getElementById('fb-quiz-counter').textContent=`${fbIdx+1} / ${total}`;
+  document.getElementById('fb-quiz-score').textContent=`정답 ${fbCorrectTotal} / 오답 ${fbWrongTotal}`;
+  document.getElementById('fb-prog-fill').style.width=`${(fbIdx/total)*100}%`;
 
   let html;
-  if(fbMode === 'manual') {
-    // [단어] → input 변환
+  if(s.mode==='manual'){
     html = esc(s.raw);
     s.blanks.forEach(b=>{
-      html = html.replace(esc(b.match), `<span class="fb-blank"><input type="text" placeholder="?" autocomplete="off" style="width:${Math.max(50, b.word.length*18)}px" data-answer="${esc(b.word)}"></span>`);
+      html = html.replace(esc(b.match), `<span class="fb-blank"><input type="text" placeholder="?" autocomplete="off" style="width:${Math.max(50,b.word.length*18)}px" data-answer="${esc(b.word)}"></span>`);
     });
-    // 가리지 않은 [word]는 그냥 표시
-    html = html.replace(/\[([^\]]+)\]/g, '$1');
+    html = html.replace(/\[([^\]]+)\]/g,'$1');
   } else {
-    // 랜덤 자동: 원문에서 선택된 단어를 input으로 교체
-    // 중복 단어 처리를 위해 replace 한 번씩만
     html = esc(s.raw);
-    // 이미 교체된 위치 추적을 위해 placeholder 방식 사용
-    const replaced = new Map(); // word → count
+    const replaced = new Map();
     s.blanks.forEach(b=>{
       const key = esc(b.word);
-      const cnt = replaced.get(key) || 0;
-      // nth occurrence 교체
-      let found = 0;
-      html = html.replace(new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'g'), match => {
+      const cnt = replaced.get(key)||0;
+      let found=0;
+      html = html.replace(new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'), match=>{
         found++;
-        if(found === cnt + 1) {
-          replaced.set(key, cnt + 1);
-          return `<span class="fb-blank"><input type="text" placeholder="?" autocomplete="off" style="width:${Math.max(50, b.word.length*18)}px" data-answer="${key}"></span>`;
-        }
+        if(found===cnt+1){ replaced.set(key,cnt+1); return `<span class="fb-blank"><input type="text" placeholder="?" autocomplete="off" style="width:${Math.max(50,b.word.length*18)}px" data-answer="${key}"></span>`; }
         return match;
       });
     });
   }
 
-  document.getElementById('fb-quiz-sentence').innerHTML = html;
-  document.getElementById('fb-check-btn').style.display = 'inline-flex';
-  document.getElementById('fb-next-btn').style.display = 'none';
-  document.getElementById('fb-result-msg').style.display = 'none';
+  document.getElementById('fb-quiz-sentence').innerHTML=html;
+  document.getElementById('fb-check-btn').style.display='inline-flex';
+  document.getElementById('fb-next-btn').style.display='none';
+  document.getElementById('fb-result-msg').style.display='none';
+  // 첫 input에 포커스
+  setTimeout(()=>document.querySelector('#fb-quiz-sentence .fb-blank input')?.focus(),80);
 }
 
 window.fbCheckAll = () => {
   const s = fbSentences[fbIdx];
   const inputs = document.querySelectorAll('#fb-quiz-sentence .fb-blank input');
-  let correct = 0, wrong = 0;
-  inputs.forEach(inp => {
+  let correct=0, wrong=0;
+  inputs.forEach(inp=>{
     const answer = inp.dataset.answer;
     const userVal = inp.value.trim();
-    const ok = userVal === answer || userVal.replace(/\s/g,'') === answer.replace(/\s/g,'');
-    inp.parentElement.classList.add(ok ? 'correct' : 'wrong');
-    if(!ok) inp.value = answer; // show answer
-    ok ? correct++ : wrong++;
-    inp.disabled = true;
+    const ok = userVal===answer || userVal.replace(/\s/g,'')===answer.replace(/\s/g,'');
+    inp.parentElement.classList.add(ok?'correct':'wrong');
+    if(!ok) inp.value=answer;
+    ok?correct++:wrong++;
+    inp.disabled=true;
   });
-  fbCorrectTotal += correct; fbWrongTotal += wrong;
-  document.getElementById('fb-quiz-score').textContent = `정답 ${fbCorrectTotal} / 오답 ${fbWrongTotal}`;
-  document.getElementById('fb-check-btn').style.display = 'none';
-  const total = fbSentences.length;
-  const isLast = fbIdx >= total-1;
-  document.getElementById('fb-next-btn').style.display = isLast ? 'none' : 'inline-flex';
-  const msgEl = document.getElementById('fb-result-msg');
-  msgEl.style.display = '';
-  if(isLast) {
-    const allTotal = fbCorrectTotal + fbWrongTotal;
-    const pct = allTotal ? Math.round(fbCorrectTotal/allTotal*100) : 0;
-    msgEl.innerHTML = `<div style="padding:12px 16px;border-radius:var(--rs);background:var(--b50);border:1px solid var(--b100);font-size:14px;font-weight:600;color:var(--b700)">완료! 정답률 ${pct}% (${fbCorrectTotal}/${allTotal})</div>`;
+  fbCorrectTotal+=correct; fbWrongTotal+=wrong;
+  document.getElementById('fb-quiz-score').textContent=`정답 ${fbCorrectTotal} / 오답 ${fbWrongTotal}`;
+  document.getElementById('fb-check-btn').style.display='none';
+  const total=fbSentences.length;
+  const isLast=fbIdx>=total-1;
+  document.getElementById('fb-next-btn').style.display=isLast?'none':'inline-flex';
+  const msgEl=document.getElementById('fb-result-msg');
+  msgEl.style.display='';
+  if(isLast){
+    const allTotal=fbCorrectTotal+fbWrongTotal;
+    const pct=allTotal?Math.round(fbCorrectTotal/allTotal*100):0;
+    msgEl.innerHTML=`<div style="padding:12px 16px;border-radius:var(--rs);background:var(--b50);border:1px solid var(--b100);font-size:14px;font-weight:600;color:var(--b700)">완료! 정답률 ${pct}% (${fbCorrectTotal}/${allTotal})</div>`;
   } else {
-    msgEl.innerHTML = `<div style="font-size:13px;color:var(--g400)">이 문장: 정답 ${correct} / 오답 ${wrong}</div>`;
+    msgEl.innerHTML=`<div style="font-size:12px;color:var(--g400)">이 문장: 정답 ${correct} / 오답 ${wrong}</div>`;
   }
 };
 
 window.fbNextSentence = () => {
   fbIdx++;
-  if(fbIdx >= fbSentences.length) { stopFillBlank(); return; }
+  if(fbIdx>=fbSentences.length){stopFillBlank();return;}
   showFbSentence();
 };
 
 window.stopFillBlank = () => {
-  document.getElementById('fb-quiz-area').style.display = 'none';
-  document.getElementById('fb-setup').style.display = '';
+  document.getElementById('fb-quiz-area').style.display='none';
+  document.getElementById('fb-setup').style.display='';
 };
 
 // ── EXAM QUIZ ──
@@ -2582,4 +2630,4 @@ document.getElementById('cal-modal').addEventListener('click',e=>{ if(e.target==
 
 </script>
 </body>
-          </html>
+  </html>
