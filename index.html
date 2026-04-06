@@ -207,6 +207,9 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
 .fb-blank.correct { background:#dcfce7; border-color:#22c55e; }
 .fb-blank.wrong { background:#fee2e2; border-color:#ef4444; }
 /* EXAM QUIZ */
+.eq-tab { padding:8px 14px; border:none; background:none; cursor:pointer; font-size:13px; font-weight:500; color:var(--g400); font-family:var(--font); border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .15s; }
+.eq-tab.active { color:var(--b600); border-bottom-color:var(--b600); font-weight:700; }
+.eq-tab:hover { color:var(--b500); }
 .eq-choice { padding:14px 18px; border-radius:var(--rs); border:1.5px solid var(--g200); background:var(--white); cursor:pointer; font-size:14px; font-weight:500; color:var(--g700); transition:all .15s; text-align:left; width:100%; font-family:var(--font); display:flex; align-items:center; gap:10px; }
 .eq-choice:hover { background:var(--b50); border-color:var(--b300); }
 .eq-choice.correct { background:#dcfce7; border-color:#22c55e; color:#16a34a; }
@@ -787,78 +790,105 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       시험 문제
     </div>
-    <!-- 설정 화면 -->
-    <div id="eq-setup">
-      <div style="font-size:13px;font-weight:600;color:var(--g600);margin-bottom:10px">문제 출제 범위</div>
-      <div id="eq-deck-select" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px"></div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
-        <label style="font-size:12px;color:var(--g500);display:flex;align-items:center;gap:5px">
-          문제 방향
-          <select id="eq-direction" style="font-size:12px;padding:5px 8px">
-            <option value="word">단어 → 뜻 고르기</option>
-            <option value="mean">뜻 → 단어 고르기</option>
-          </select>
-        </label>
-        <label style="font-size:12px;color:var(--g500);display:flex;align-items:center;gap:5px">
-          보기 수
-          <select id="eq-choices" style="font-size:12px;padding:5px 8px">
-            <option value="3">3지선다</option>
-            <option value="4" selected>4지선다</option>
-            <option value="5">5지선다</option>
-          </select>
-        </label>
-        <label style="font-size:12px;color:var(--g500);display:flex;align-items:center;gap:5px">
-          출제 순서
-          <select id="eq-order" style="font-size:12px;padding:5px 8px">
-            <option value="seq">순서대로</option>
-            <option value="rand">랜덤</option>
-          </select>
-        </label>
+
+    <!-- 탭 -->
+    <div style="display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--g200);padding-bottom:0">
+      <button class="eq-tab active" id="eq-tab-list" onclick="eqShowTab('list')">문제 목록</button>
+      <button class="eq-tab" id="eq-tab-edit" onclick="eqShowTab('edit')">문제 만들기</button>
+    </div>
+
+    <!-- 문제 목록 탭 -->
+    <div id="eq-panel-list">
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+        <div id="eq-set-tabs" style="display:flex;gap:6px;flex-wrap:wrap;flex:1"></div>
+        <button class="btn sm primary" onclick="eqCreateSet()">+ 새 세트</button>
       </div>
-      <!-- 문제에 사진 추가 -->
-      <div style="margin-bottom:16px">
-        <div style="font-size:12px;font-weight:600;color:var(--g600);margin-bottom:8px">단어별 사진 추가 (선택)</div>
-        <div id="eq-photo-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
-        <label class="btn sm" style="cursor:pointer;display:inline-flex">
-          <input type="file" id="eq-photo-input" accept="image/*" style="display:none" onchange="addEqPhoto(event)">
-          📷 사진 추가
-        </label>
-        <div style="font-size:11px;color:var(--g400);margin-top:4px">사진을 추가하면 해당 문제에 이미지가 함께 표시됩니다.</div>
-      </div>
-      <div id="eq-word-count" style="font-size:13px;color:var(--b600);margin-bottom:14px"></div>
+      <div id="eq-question-list" style="margin-bottom:14px"></div>
       <div class="btn-group" style="justify-content:flex-start">
         <button class="btn primary" onclick="startExamQuiz()">시험 시작</button>
+        <button class="btn sm" onclick="eqShowTab('edit')">문제 추가하기</button>
       </div>
     </div>
+
+    <!-- 문제 만들기 탭 -->
+    <div id="eq-panel-edit" style="display:none">
+      <!-- 세트 선택 -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:12px;color:var(--g500);margin-bottom:6px">저장할 세트</div>
+        <div id="eq-edit-set-tabs" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+      <!-- 문제 유형 -->
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="btn sm active" id="eq-type-mc" onclick="eqSetType('mc')">객관식</button>
+        <button class="btn sm" id="eq-type-sa" onclick="eqSetType('sa')">주관식</button>
+      </div>
+      <!-- 문제 입력 -->
+      <div style="margin-bottom:10px">
+        <div style="font-size:12px;color:var(--g500);margin-bottom:5px">문제</div>
+        <textarea id="eq-q-text" placeholder="문제를 입력하세요" style="width:100%;min-height:70px;font-size:14px"></textarea>
+      </div>
+      <!-- 사진 첨부 -->
+      <div style="margin-bottom:12px">
+        <label class="btn sm" style="cursor:pointer;display:inline-flex;gap:6px">
+          <input type="file" id="eq-q-img-input" accept="image/*" style="display:none" onchange="eqAttachImg(event)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          사진 첨부
+        </label>
+        <span id="eq-q-img-name" style="font-size:11px;color:var(--g400);margin-left:8px"></span>
+        <button id="eq-q-img-del" onclick="eqRemoveImg()" style="display:none;background:none;border:none;cursor:pointer;font-size:12px;color:var(--red);margin-left:4px">삭제</button>
+      </div>
+      <!-- 객관식 보기 -->
+      <div id="eq-mc-section">
+        <div style="font-size:12px;color:var(--g500);margin-bottom:6px">보기 (정답에 체크)</div>
+        <div id="eq-options-wrap"></div>
+        <button class="btn sm" onclick="eqAddOption()" style="margin-top:6px">+ 보기 추가</button>
+      </div>
+      <!-- 주관식 정답 -->
+      <div id="eq-sa-section" style="display:none;margin-bottom:10px">
+        <div style="font-size:12px;color:var(--g500);margin-bottom:5px">정답 (쉼표로 복수정답)</div>
+        <input type="text" id="eq-sa-answer" placeholder="정답 입력" style="width:100%;font-size:13px">
+      </div>
+      <div class="btn-group" style="justify-content:flex-start;margin-top:14px">
+        <button class="btn primary" onclick="eqSaveQuestion()">저장</button>
+        <button class="btn" onclick="eqCancelEdit()">취소</button>
+      </div>
+      <!-- 수정 중 표시 -->
+      <div id="eq-edit-indicator" style="display:none;font-size:12px;color:var(--b600);margin-top:8px;background:var(--b50);padding:8px 12px;border-radius:var(--rs)">수정 중인 문제가 있습니다</div>
+    </div>
+
     <!-- 시험 진행 화면 -->
     <div id="eq-quiz-area" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-        <span id="eq-counter" style="font-size:12px;color:var(--g400)">문제 1 / 10</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+        <span id="eq-counter" style="font-size:12px;color:var(--g400)">문제 1 / 1</span>
         <span id="eq-qscore" style="font-size:12px;color:var(--g400)">정답 0 / 오답 0</span>
       </div>
-      <div id="eq-progress-bar" style="height:4px;background:var(--g100);border-radius:99px;margin-bottom:16px;overflow:hidden">
+      <div style="height:4px;background:var(--g100);border-radius:99px;margin-bottom:16px;overflow:hidden">
         <div id="eq-prog-fill" style="height:100%;background:linear-gradient(90deg,var(--b400),var(--b600));border-radius:99px;transition:width .4s;width:0%"></div>
       </div>
-      <div id="eq-question-img" style="display:none;text-align:center;margin-bottom:12px">
-        <img id="eq-q-img" style="max-height:200px;max-width:100%;border-radius:var(--rs);border:1px solid var(--g200)">
+      <div id="eq-q-img-wrap" style="display:none;text-align:center;margin-bottom:12px">
+        <img id="eq-q-img-show" style="max-height:200px;max-width:100%;border-radius:var(--rs);border:1px solid var(--g200)">
       </div>
-      <div id="eq-question" style="font-size:22px;font-weight:700;color:var(--g900);margin-bottom:20px;text-align:center;padding:16px;background:var(--g50);border-radius:var(--rs)"></div>
-      <div id="eq-choices-wrap" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
-      <div id="eq-feedback" style="display:none;padding:12px 16px;border-radius:var(--rs);font-size:14px;font-weight:600;margin-bottom:12px"></div>
+      <div id="eq-question-text" style="font-size:18px;font-weight:700;color:var(--g900);margin-bottom:18px;padding:16px;background:var(--g50);border-radius:var(--rs);line-height:1.5"></div>
+      <div id="eq-choices-wrap" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px"></div>
+      <div id="eq-sa-wrap" style="display:none;margin-bottom:14px">
+        <input type="text" id="eq-sa-input" placeholder="정답을 입력하세요" style="width:100%;font-size:14px" onkeydown="if(event.key==='Enter')eqCheckSA()">
+        <div style="margin-top:8px"><button class="btn primary" onclick="eqCheckSA()">확인</button></div>
+      </div>
+      <div id="eq-feedback" style="display:none;padding:11px 14px;border-radius:var(--rs);font-size:13px;font-weight:600;margin-bottom:12px"></div>
       <div class="btn-group">
         <button class="btn" id="eq-next-btn" onclick="eqNext()" style="display:none">다음 문제</button>
         <button class="btn ghost" onclick="stopExamQuiz()">종료</button>
       </div>
     </div>
+
     <!-- 결과 화면 -->
-    <div id="eq-result-area" style="display:none;text-align:center;padding:16px 0">
-      <div style="font-size:40px;margin-bottom:10px" id="eq-result-emoji">🎯</div>
-      <div style="font-size:20px;font-weight:700;margin-bottom:6px">시험 완료!</div>
-      <div id="eq-result-detail" style="font-size:14px;color:var(--g500);margin-bottom:16px"></div>
-      <div id="eq-wrong-review" style="text-align:left;margin-bottom:16px"></div>
+    <div id="eq-result-area" style="display:none;padding:16px 0">
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px;text-align:center">시험 완료</div>
+      <div id="eq-result-detail" style="font-size:14px;color:var(--g500);margin-bottom:18px;text-align:center"></div>
+      <div id="eq-wrong-review" style="margin-bottom:16px"></div>
       <div class="btn-group">
         <button class="btn primary" onclick="startExamQuiz()">다시 풀기</button>
-        <button class="btn ghost" onclick="eqGoSetup()">설정으로</button>
+        <button class="btn" onclick="eqGoSetup()">목록으로</button>
       </div>
     </div>
   </div>
@@ -1946,179 +1976,365 @@ window.stopFillBlank = () => {
   document.getElementById('fb-setup').style.display = '';
 };
 
-// ── EXAM QUIZ (객관식) ──
+// ── EXAM QUIZ ──
+// eqSets: [{id, name, questions:[{id, type:'mc'|'sa', text, img, options:[{text,correct}], answer}]}]
+let eqSets=[], eqCurrentSetId=null, eqEditingQId=null, eqCurrentImg=null;
+let eqRunQuestions=[], eqRunIdx=0, eqRunCorrect=0, eqRunWrong=0, eqRunAnswered=false, eqRunWrongList=[];
 
 async function initExamQuiz() {
-  // decks already loaded
-  renderEqDeckSelect();
-  updateEqWordCount();
-}
-
-function renderEqDeckSelect() {
-  const wrap = document.getElementById('eq-deck-select');
-  wrap.innerHTML = decks.map(d=>{
-    const active = eqSelectedDecks.includes(d.id) || eqSelectedDecks.length===0;
-    return `<button class="btn sm ${active?'primary':''}" onclick="eqToggleDeck('${d.id}')">${esc(d.name)}</button>`;
-  }).join('');
-  if(eqSelectedDecks.length===0) eqSelectedDecks = decks.map(d=>d.id);
-}
-
-window.eqToggleDeck = id => {
-  if(eqSelectedDecks.includes(id)) {
-    if(eqSelectedDecks.length<=1) { notify('최소 1개 덱을 선택하세요'); return; }
-    eqSelectedDecks = eqSelectedDecks.filter(x=>x!==id);
-  } else {
-    eqSelectedDecks.push(id);
+  const data = await fsGet('data/examsets', {sets:[]});
+  eqSets = data.sets || [];
+  if(!eqSets.length) {
+    eqSets = [{id:'eq_default', name:'기본 세트', questions:[]}];
+    await eqSaveSets();
   }
-  renderEqDeckSelect();
-  updateEqWordCount();
+  if(!eqCurrentSetId) eqCurrentSetId = eqSets[0].id;
+  eqRenderSetTabs();
+  eqRenderQuestionList();
+  eqRenderEditSetTabs();
+  eqInitOptions();
+}
+
+async function eqSaveSets() {
+  await fsSet('data/examsets', {sets: eqSets});
+}
+
+function eqCurrentSet() {
+  return eqSets.find(s=>s.id===eqCurrentSetId) || eqSets[0];
+}
+
+// ── 탭 전환 ──
+window.eqShowTab = tab => {
+  document.getElementById('eq-panel-list').style.display = tab==='list' ? '' : 'none';
+  document.getElementById('eq-panel-edit').style.display = tab==='edit' ? '' : 'none';
+  document.getElementById('eq-tab-list').classList.toggle('active', tab==='list');
+  document.getElementById('eq-tab-edit').classList.toggle('active', tab==='edit');
 };
 
-async function updateEqWordCount() {
-  let count = 0;
-  for(const id of eqSelectedDecks) {
-    const words = await fsColGet('vocab_'+id);
-    count += words.length;
-  }
-  document.getElementById('eq-word-count').textContent = `선택된 단어 수: ${count}개`;
-}
-
-window.addEqPhoto = e => {
-  const file = e.target.files[0]; if(!file) return;
-  const word = prompt('어떤 단어에 대한 사진인가요?');
-  if(!word) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    eqPhotos[word.trim()] = ev.target.result;
-    renderEqPhotoList();
-    notify(`"${word}" 사진 추가됨`);
-  };
-  reader.readAsDataURL(file);
-  e.target.value = '';
+// ── 세트 관리 ──
+window.eqCreateSet = async () => {
+  const name = prompt('세트 이름을 입력하세요');
+  if(!name||!name.trim()) return;
+  const id = 'eq_'+Date.now();
+  eqSets.push({id, name:name.trim(), questions:[]});
+  eqCurrentSetId = id;
+  await eqSaveSets();
+  eqRenderSetTabs();
+  eqRenderQuestionList();
+  eqRenderEditSetTabs();
 };
 
-function renderEqPhotoList() {
-  document.getElementById('eq-photo-list').innerHTML = Object.entries(eqPhotos).map(([word, src])=>`
-    <div class="eq-photo-thumb">
-      <img src="${src}" title="${esc(word)}">
-      <button class="eq-del-img" onclick="deleteEqPhoto('${esc(word)}')">×</button>
-      <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.5);color:#fff;font-size:9px;padding:2px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(word)}</div>
-    </div>`).join('');
-}
-
-window.deleteEqPhoto = word => { delete eqPhotos[word]; renderEqPhotoList(); };
-
-window.startExamQuiz = async () => {
-  // 선택된 덱에서 모든 단어 수집
-  eqAllWords = [];
-  for(const id of eqSelectedDecks) {
-    const words = await fsColGet('vocab_'+id);
-    eqAllWords.push(...words);
-  }
-  if(eqAllWords.length < 2) { notify('단어가 2개 이상 필요합니다'); return; }
-  const orderType = document.getElementById('eq-order').value;
-  if(orderType === 'rand') {
-    eqOrder = [...Array(eqAllWords.length).keys()].sort(()=>Math.random()-.5);
-  } else {
-    eqOrder = [...Array(eqAllWords.length).keys()];
-  }
-  eqEqIdx = 0; eqCorrect = 0; eqWrong = 0; eqAnswered = false;
-  document.getElementById('eq-setup').style.display = 'none';
-  document.getElementById('eq-result-area').style.display = 'none';
-  document.getElementById('eq-quiz-area').style.display = '';
-  showEqQuestion();
-};
-
-function showEqQuestion() {
-  const total = eqOrder.length;
-  const v = eqAllWords[eqOrder[eqEqIdx]];
-  const dir = document.getElementById('eq-direction').value;
-  const numChoices = parseInt(document.getElementById('eq-choices').value);
-  eqAnswered = false;
-  document.getElementById('eq-counter').textContent = `문제 ${eqEqIdx+1} / ${total}`;
-  document.getElementById('eq-qscore').textContent = `정답 ${eqCorrect} / 오답 ${eqWrong}`;
-  document.getElementById('eq-prog-fill').style.width = `${(eqEqIdx/total)*100}%`;
-  document.getElementById('eq-feedback').style.display = 'none';
-  document.getElementById('eq-next-btn').style.display = 'none';
-  // question
-  const questionText = dir==='word' ? v.word : v.mean;
-  const correctAnswer = dir==='word' ? v.mean : v.word;
-  document.getElementById('eq-question').textContent = questionText;
-  // image
-  const imgSrc = eqPhotos[v.word] || eqPhotos[v.mean];
-  const imgWrap = document.getElementById('eq-question-img');
-  if(imgSrc) {
-    imgWrap.style.display = '';
-    document.getElementById('eq-q-img').src = imgSrc;
-  } else { imgWrap.style.display = 'none'; }
-  // generate choices
-  const otherAnswers = eqAllWords
-    .filter(x=>x.id!==v.id)
-    .map(x=>dir==='word'?x.mean:x.word)
-    .sort(()=>Math.random()-.5)
-    .slice(0, numChoices-1);
-  const choices = [correctAnswer, ...otherAnswers].sort(()=>Math.random()-.5);
-  const nums = ['①','②','③','④','⑤'];
-  document.getElementById('eq-choices-wrap').innerHTML = choices.map((c,i)=>`
-    <button class="eq-choice" onclick="eqSelect(this,'${esc(c)}','${esc(correctAnswer)}')">
-      <span class="eq-num">${nums[i]||i+1}</span>
-      <span>${esc(c)}</span>
+function eqRenderSetTabs() {
+  document.getElementById('eq-set-tabs').innerHTML = eqSets.map(s=>`
+    <button class="btn sm ${s.id===eqCurrentSetId?'primary':''}" onclick="eqSwitchSet('${s.id}')">
+      ${esc(s.name)}
+      ${eqSets.length>1?`<span onclick="event.stopPropagation();eqDeleteSet('${s.id}')" style="margin-left:4px;opacity:.6;font-size:11px">×</span>`:''}
     </button>`).join('');
 }
 
-window.eqSelect = (btn, selected, correct) => {
-  if(eqAnswered) return;
-  eqAnswered = true;
-  document.querySelectorAll('.eq-choice').forEach(b=>b.classList.add('disabled'));
-  const feedbackEl = document.getElementById('eq-feedback');
-  if(selected === correct) {
-    eqCorrect++;
-    btn.classList.add('correct');
-    feedbackEl.style.cssText='display:block;background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0;padding:12px 16px;border-radius:var(--rs);font-size:14px;font-weight:600;margin-bottom:12px';
-    feedbackEl.textContent = '✓ 정답!';
-  } else {
-    eqWrong++;
-    btn.classList.add('wrong');
-    // 정답 버튼 highlight
-    document.querySelectorAll('.eq-choice').forEach(b=>{
-      if(b.querySelector('span:last-child')?.textContent === correct) b.classList.add('correct');
-    });
-    feedbackEl.style.cssText='display:block;background:#fee2e2;color:#dc2626;border:1px solid #fecaca;padding:12px 16px;border-radius:var(--rs);font-size:14px;font-weight:600;margin-bottom:12px';
-    feedbackEl.textContent = `✗ 오답. 정답: ${correct}`;
+function eqRenderEditSetTabs() {
+  document.getElementById('eq-edit-set-tabs').innerHTML = eqSets.map(s=>`
+    <button class="btn sm ${s.id===eqCurrentSetId?'primary':''}" onclick="eqSwitchSet('${s.id}');eqRenderEditSetTabs()">${esc(s.name)}</button>`).join('');
+}
+
+window.eqSwitchSet = id => {
+  eqCurrentSetId = id;
+  eqRenderSetTabs();
+  eqRenderQuestionList();
+  eqRenderEditSetTabs();
+};
+
+window.eqDeleteSet = async id => {
+  if(eqSets.length<=1){notify('마지막 세트는 삭제할 수 없습니다');return;}
+  if(!confirm('이 세트와 문제를 모두 삭제할까요?')) return;
+  eqSets = eqSets.filter(s=>s.id!==id);
+  if(eqCurrentSetId===id) eqCurrentSetId = eqSets[0].id;
+  await eqSaveSets();
+  eqRenderSetTabs(); eqRenderQuestionList(); eqRenderEditSetTabs();
+};
+
+// ── 문제 목록 렌더 ──
+function eqRenderQuestionList() {
+  const set = eqCurrentSet();
+  const qs = set.questions || [];
+  const el = document.getElementById('eq-question-list');
+  if(!qs.length) {
+    el.innerHTML='<div style="font-size:13px;color:var(--g400);padding:12px 0;text-align:center">문제가 없습니다. 문제 만들기 탭에서 추가하세요.</div>';
+    return;
   }
-  document.getElementById('eq-qscore').textContent = `정답 ${eqCorrect} / 오답 ${eqWrong}`;
-  const isLast = eqEqIdx >= eqOrder.length-1;
-  if(isLast) {
-    setTimeout(()=>showEqResult(), 1000);
+  el.innerHTML = qs.map((q,i)=>`
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:var(--g50);border:1px solid var(--g100);border-radius:var(--rs);margin-bottom:6px">
+      <div style="font-size:12px;font-weight:700;color:var(--b600);min-width:24px;padding-top:1px">${i+1}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--g800);margin-bottom:3px">${esc(q.text)}</div>
+        <div style="font-size:11px;color:var(--g400)">${q.type==='mc'?'객관식 '+q.options.length+'지':'주관식'} ${q.img?'· 사진 있음':''}</div>
+      </div>
+      <div style="display:flex;gap:5px;flex-shrink:0">
+        <button class="btn xs" onclick="eqEditQuestion('${q.id}')">수정</button>
+        <button class="btn xs danger" onclick="eqDeleteQuestion('${q.id}')">삭제</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── 문제 유형 토글 ──
+window.eqSetType = type => {
+  document.getElementById('eq-mc-section').style.display = type==='mc' ? '' : 'none';
+  document.getElementById('eq-sa-section').style.display = type==='sa' ? '' : 'none';
+  document.getElementById('eq-type-mc').classList.toggle('active', type==='mc');
+  document.getElementById('eq-type-sa').classList.toggle('active', type==='sa');
+  document.getElementById('eq-type-mc').style.background = type==='mc'?'var(--b600)':'';
+  document.getElementById('eq-type-mc').style.color = type==='mc'?'#fff':'';
+  document.getElementById('eq-type-mc').style.borderColor = type==='mc'?'var(--b600)':'';
+  document.getElementById('eq-type-sa').style.background = type==='sa'?'var(--b600)':'';
+  document.getElementById('eq-type-sa').style.color = type==='sa'?'#fff':'';
+  document.getElementById('eq-type-sa').style.borderColor = type==='sa'?'var(--b600)':'';
+};
+
+function eqGetType() {
+  return document.getElementById('eq-sa-section').style.display==='none' ? 'mc' : 'sa';
+}
+
+// ── 보기 관리 ──
+let eqOptions = [{text:'',correct:true},{text:'',correct:false},{text:'',correct:false},{text:'',correct:false}];
+
+function eqInitOptions(opts) {
+  eqOptions = opts || [{text:'',correct:true},{text:'',correct:false},{text:'',correct:false},{text:'',correct:false}];
+  eqRenderOptions();
+}
+
+function eqRenderOptions() {
+  document.getElementById('eq-options-wrap').innerHTML = eqOptions.map((o,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <input type="radio" name="eq-correct" ${o.correct?'checked':''} onchange="eqSetCorrect(${i})" style="cursor:pointer;accent-color:var(--b500)">
+      <input type="text" value="${esc(o.text)}" placeholder="보기 ${i+1}" oninput="eqOptions[${i}].text=this.value" style="flex:1;font-size:13px">
+      ${eqOptions.length>2?`<button onclick="eqRemoveOption(${i})" style="background:none;border:none;cursor:pointer;color:var(--g300);font-size:16px;padding:0 4px" title="삭제">×</button>`:''}
+    </div>`).join('');
+}
+
+window.eqSetCorrect = idx => { eqOptions.forEach((o,i)=>o.correct=(i===idx)); eqRenderOptions(); };
+window.eqAddOption = () => {
+  if(eqOptions.length>=6){notify('보기는 최대 6개');return;}
+  eqOptions.push({text:'',correct:false}); eqRenderOptions();
+};
+window.eqRemoveOption = idx => {
+  if(eqOptions.length<=2){notify('보기는 최소 2개');return;}
+  const wasCorrect = eqOptions[idx].correct;
+  eqOptions.splice(idx,1);
+  if(wasCorrect) eqOptions[0].correct=true;
+  eqRenderOptions();
+};
+
+// ── 사진 첨부 ──
+window.eqAttachImg = e => {
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    eqCurrentImg = ev.target.result;
+    document.getElementById('eq-q-img-name').textContent = file.name;
+    document.getElementById('eq-q-img-del').style.display = 'inline';
+  };
+  reader.readAsDataURL(file);
+  e.target.value='';
+};
+window.eqRemoveImg = () => {
+  eqCurrentImg=null;
+  document.getElementById('eq-q-img-name').textContent='';
+  document.getElementById('eq-q-img-del').style.display='none';
+};
+
+// ── 저장 ──
+window.eqSaveQuestion = async () => {
+  const text = document.getElementById('eq-q-text').value.trim();
+  if(!text){notify('문제를 입력하세요');return;}
+  const type = eqGetType();
+  let q;
+  if(type==='mc'){
+    const filled = eqOptions.filter(o=>o.text.trim());
+    if(filled.length<2){notify('보기를 2개 이상 입력하세요');return;}
+    const hasCorrect = eqOptions.some(o=>o.correct&&o.text.trim());
+    if(!hasCorrect){notify('정답 보기를 선택하세요');return;}
+    q = {id: eqEditingQId||('q_'+Date.now()), type:'mc', text, img:eqCurrentImg||null, options: eqOptions.filter(o=>o.text.trim()).map(o=>({text:o.text.trim(),correct:o.correct}))};
   } else {
-    document.getElementById('eq-next-btn').style.display = 'inline-flex';
+    const ans = document.getElementById('eq-sa-answer').value.trim();
+    if(!ans){notify('정답을 입력하세요');return;}
+    q = {id: eqEditingQId||('q_'+Date.now()), type:'sa', text, img:eqCurrentImg||null, answer:ans};
+  }
+  const set = eqCurrentSet();
+  if(eqEditingQId){
+    const idx = set.questions.findIndex(x=>x.id===eqEditingQId);
+    if(idx>=0) set.questions[idx]=q; else set.questions.push(q);
+  } else {
+    set.questions.push(q);
+  }
+  await eqSaveSets();
+  eqCancelEdit();
+  eqRenderQuestionList();
+  notify(eqEditingQId?'수정 완료':'문제 추가됨');
+  eqEditingQId=null;
+};
+
+window.eqCancelEdit = () => {
+  eqEditingQId=null; eqCurrentImg=null;
+  document.getElementById('eq-q-text').value='';
+  document.getElementById('eq-sa-answer').value='';
+  document.getElementById('eq-q-img-name').textContent='';
+  document.getElementById('eq-q-img-del').style.display='none';
+  document.getElementById('eq-edit-indicator').style.display='none';
+  eqInitOptions();
+  eqSetType('mc');
+};
+
+window.eqEditQuestion = id => {
+  const set = eqCurrentSet();
+  const q = set.questions.find(x=>x.id===id); if(!q) return;
+  eqEditingQId = id;
+  document.getElementById('eq-q-text').value = q.text;
+  eqCurrentImg = q.img||null;
+  document.getElementById('eq-q-img-name').textContent = q.img ? '(첨부됨)' : '';
+  document.getElementById('eq-q-img-del').style.display = q.img ? 'inline':'none';
+  document.getElementById('eq-edit-indicator').style.display='';
+  if(q.type==='mc'){
+    eqSetType('mc');
+    eqInitOptions(q.options.map(o=>({...o})));
+  } else {
+    eqSetType('sa');
+    document.getElementById('eq-sa-answer').value=q.answer||'';
+    eqInitOptions();
+  }
+  eqShowTab('edit');
+  document.getElementById('eq-q-text').focus();
+};
+
+window.eqDeleteQuestion = async id => {
+  if(!confirm('이 문제를 삭제할까요?')) return;
+  const set = eqCurrentSet();
+  set.questions = set.questions.filter(q=>q.id!==id);
+  await eqSaveSets();
+  eqRenderQuestionList();
+  notify('삭제됨');
+};
+
+// ── 시험 시작 ──
+window.startExamQuiz = () => {
+  const set = eqCurrentSet();
+  if(!set.questions.length){notify('문제를 먼저 추가하세요');return;}
+  eqRunQuestions = [...set.questions];
+  eqRunIdx=0; eqRunCorrect=0; eqRunWrong=0; eqRunAnswered=false; eqRunWrongList=[];
+  document.getElementById('eq-panel-list').style.display='none';
+  document.getElementById('eq-panel-edit').style.display='none';
+  document.getElementById('eq-result-area').style.display='none';
+  document.getElementById('eq-quiz-area').style.display='';
+  eqShowRunQuestion();
+};
+
+function eqShowRunQuestion() {
+  const q = eqRunQuestions[eqRunIdx];
+  const total = eqRunQuestions.length;
+  eqRunAnswered = false;
+  document.getElementById('eq-counter').textContent=`문제 ${eqRunIdx+1} / ${total}`;
+  document.getElementById('eq-qscore').textContent=`정답 ${eqRunCorrect} / 오답 ${eqRunWrong}`;
+  document.getElementById('eq-prog-fill').style.width=`${(eqRunIdx/total)*100}%`;
+  document.getElementById('eq-feedback').style.display='none';
+  document.getElementById('eq-next-btn').style.display='none';
+  document.getElementById('eq-question-text').textContent=q.text;
+  // 사진
+  const imgWrap=document.getElementById('eq-q-img-wrap');
+  if(q.img){imgWrap.style.display='';document.getElementById('eq-q-img-show').src=q.img;}
+  else imgWrap.style.display='none';
+  // 객관식/주관식 영역 전환
+  const mcWrap=document.getElementById('eq-choices-wrap');
+  const saWrap=document.getElementById('eq-sa-wrap');
+  if(q.type==='mc'){
+    saWrap.style.display='none'; mcWrap.style.display='flex';
+    const shuffled=[...q.options].sort(()=>Math.random()-.5);
+    mcWrap.innerHTML=shuffled.map((o,i)=>`
+      <button class="eq-choice" onclick="eqSelectMC(this,'${esc(o.text)}',${o.correct})">
+        <span class="eq-num">${i+1}</span>
+        <span>${esc(o.text)}</span>
+      </button>`).join('');
+  } else {
+    mcWrap.style.display='none'; saWrap.style.display='';
+    document.getElementById('eq-sa-input').value='';
+    setTimeout(()=>document.getElementById('eq-sa-input').focus(),80);
+  }
+}
+
+window.eqSelectMC = (btn, selected, isCorrect) => {
+  if(eqRunAnswered) return;
+  eqRunAnswered=true;
+  document.querySelectorAll('.eq-choice').forEach(b=>b.classList.add('disabled'));
+  if(isCorrect){
+    eqRunCorrect++;
+    btn.classList.add('correct');
+    eqFeedback(true,'정답입니다');
+  } else {
+    eqRunWrong++;
+    btn.classList.add('wrong');
+    eqRunWrongList.push(eqRunQuestions[eqRunIdx]);
+    document.querySelectorAll('.eq-choice').forEach(b=>{ if(b.querySelector('span:last-child')?.textContent===eqRunQuestions[eqRunIdx].options.find(o=>o.correct)?.text) b.classList.add('correct'); });
+    const correctText=eqRunQuestions[eqRunIdx].options.find(o=>o.correct)?.text||'';
+    eqFeedback(false,'오답. 정답: '+correctText);
   }
 };
+
+window.eqCheckSA = () => {
+  if(eqRunAnswered) return;
+  const q=eqRunQuestions[eqRunIdx];
+  const input=document.getElementById('eq-sa-input').value.trim();
+  if(!input) return;
+  eqRunAnswered=true;
+  document.getElementById('eq-sa-input').disabled=true;
+  const answers=(q.answer||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const ok=answers.some(a=>input===a||input.replace(/\s/g,'')===a.replace(/\s/g,''));
+  if(ok){ eqRunCorrect++; eqFeedback(true,'정답입니다'); }
+  else { eqRunWrong++; eqRunWrongList.push(q); eqFeedback(false,'오답. 정답: '+q.answer); }
+};
+
+function eqFeedback(ok, msg) {
+  const el=document.getElementById('eq-feedback');
+  el.style.cssText=`display:block;padding:11px 14px;border-radius:var(--rs);font-size:13px;font-weight:600;margin-bottom:12px;background:${ok?'#dcfce7':'#fee2e2'};color:${ok?'#16a34a':'#dc2626'};border:1px solid ${ok?'#bbf7d0':'#fecaca'}`;
+  el.textContent=msg;
+  document.getElementById('eq-qscore').textContent=`정답 ${eqRunCorrect} / 오답 ${eqRunWrong}`;
+  const isLast=eqRunIdx>=eqRunQuestions.length-1;
+  if(isLast) setTimeout(()=>eqShowResult(),900);
+  else document.getElementById('eq-next-btn').style.display='inline-flex';
+}
 
 window.eqNext = () => {
-  eqEqIdx++;
-  if(eqEqIdx >= eqOrder.length) { showEqResult(); return; }
-  showEqQuestion();
+  eqRunIdx++;
+  if(eqRunIdx>=eqRunQuestions.length){eqShowResult();return;}
+  document.getElementById('eq-sa-input').disabled=false;
+  eqShowRunQuestion();
 };
 
-function showEqResult() {
-  document.getElementById('eq-quiz-area').style.display = 'none';
-  document.getElementById('eq-result-area').style.display = '';
-  const total = eqOrder.length;
-  const pct = Math.round(eqCorrect/total*100);
-  document.getElementById('eq-result-emoji').textContent = pct>=80?'🏆':pct>=60?'😊':'📚';
-  document.getElementById('eq-result-detail').textContent = `${total}문제 중 ${eqCorrect}개 정답 (${pct}%)`;
+function eqShowResult() {
+  document.getElementById('eq-quiz-area').style.display='none';
+  document.getElementById('eq-result-area').style.display='';
+  const total=eqRunQuestions.length;
+  const pct=Math.round(eqRunCorrect/total*100);
+  document.getElementById('eq-result-detail').textContent=`${total}문제 중 ${eqRunCorrect}개 정답 (${pct}%)`;
+  const reviewEl=document.getElementById('eq-wrong-review');
+  if(!eqRunWrongList.length){ reviewEl.innerHTML=''; return; }
+  reviewEl.innerHTML=`<div style="font-size:12px;font-weight:700;color:var(--g500);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">오답 목록</div>`+
+    eqRunWrongList.map(q=>{
+      const ans=q.type==='mc'?(q.options.find(o=>o.correct)?.text||''):q.answer;
+      return `<div style="padding:10px 14px;background:#fee2e2;border:1px solid #fecaca;border-radius:var(--rs);margin-bottom:6px;font-size:13px">
+        <div style="font-weight:600;color:var(--g800);margin-bottom:4px">${esc(q.text)}</div>
+        <div style="color:#dc2626">정답: ${esc(ans)}</div>
+      </div>`;
+    }).join('');
 }
 
 window.stopExamQuiz = () => {
-  document.getElementById('eq-quiz-area').style.display = 'none';
-  document.getElementById('eq-result-area').style.display = 'none';
-  document.getElementById('eq-setup').style.display = '';
+  document.getElementById('eq-quiz-area').style.display='none';
+  document.getElementById('eq-result-area').style.display='none';
+  eqGoSetup();
 };
-
 window.eqGoSetup = () => {
-  document.getElementById('eq-result-area').style.display = 'none';
-  document.getElementById('eq-setup').style.display = '';
+  document.getElementById('eq-result-area').style.display='none';
+  document.getElementById('eq-panel-list').style.display='';
+  document.getElementById('eq-panel-edit').style.display='none';
+  eqShowTab('list');
 };
 
 // ── RANKING ──
